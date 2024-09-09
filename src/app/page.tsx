@@ -19,7 +19,8 @@ export default function Home() {
       <h1 className="text-xl font-bold">To Do List</h1>
       <ul className="space-y-2">
       {todos.map(({title, description, completed}, index) => (
-       <ToDoItem 
+       <ToDoItem
+       key={index} 
        title={title}
        description={description}
        completed={completed}
