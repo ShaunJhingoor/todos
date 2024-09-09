@@ -1,76 +1,55 @@
 "use client";
-import { useState } from "react";
 import { NewToDoForm } from "./components/new-todo-form";
-
-type ToDoItem = {
-  title: string;
-  description: string;
-  completed: boolean;
-}
+import { useMutation, useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { Id } from "../../convex/_generated/dataModel";
 
 export default function Home() {
-  const [todos, setTodos] = useState<ToDoItem[]>([
-    {title: "Example", description: "This is an example", completed: false}
-  ])
+  
+  const todos = useQuery(api.functions.listTodos)
 
   return (
     <div className="max-w-screen-md mx-auto p-4 space-y-4">
       <h1 className="text-xl font-bold">To Do List</h1>
       <ul className="space-y-2">
-      {todos.map(({title, description, completed}, index) => (
+      {todos?.map(({_id, title, description, completed}, index) => (
        <ToDoItem
        key={index} 
+       id={_id}
        title={title}
        description={description}
        completed={completed}
-       onCompleteChanged={(newValue) =>{
-        setTodos(prev =>{
-          const newToDos = [...prev] 
-          newToDos[index].completed = newValue
-          return newToDos
-        })
-       }}
-       onRemove={() => {
-        setTodos(prev => {
-          const newToDos = [...prev].filter((_, i) => i !== index)
-          return newToDos
-        })
-       }}/>
+       />
       ))}
       </ul>
       <ul>
-          <NewToDoForm onCreate={(title, description) => 
-            setTodos(prev => {
-              const newToDos = [...prev]
-              newToDos.push({title, description, completed: false})
-              return newToDos
-            })}
-          />
+          <NewToDoForm/>
       </ul>
     </div>
   );
 }
 
-function ToDoItem({title, description, completed, onCompleteChanged, onRemove}: {
+function ToDoItem({id, title, description, completed}: {
+  id: Id<"todos">
   title:string
   description: string, 
   completed: boolean,
-  onCompleteChanged: (newValue:boolean) => void
-  onRemove: () => void
 }){
+  const updateTodo = useMutation(api.functions.updateTodo)
+  const deleteTodo = useMutation(api.functions.deleteTodo)
   return (
     <li className="w-full flex items-center gap-2 border rounded p-2">
     <input 
     type="checkbox" 
     checked={completed} 
-    onChange={e => onCompleteChanged(e.target.checked)}
+    onChange={e => updateTodo({id, completed: e.target.checked})}
     />
     <div>
     <p className="font-semibold">{title}</p> 
     <p className="text-sm text-gray-600">{description}</p>
     </div>
     <div className="ml-auto">
-      <button type="button" className="text-red-500 cursor-pointer" onClick={() => onRemove()}>Remove</button>
+      <button type="button" className="text-red-500 cursor-pointer" onClick={() => deleteTodo({id})}>Remove</button>
     </div>
   </li>
   )
