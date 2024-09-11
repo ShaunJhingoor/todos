@@ -1,59 +1,237 @@
 import { mutation, query } from "./_generated/server"
 import {v} from "convex/values"
 import { requireUser } from "./helper";
+import { getUserByEmail } from "./helper";
+
+export const listUserLists = query({
+    handler: async (ctx) => {
+      const user = await requireUser(ctx);
+  
+      // Fetch all lists and filter client-side
+      const allLists = await ctx.db.query("lists").collect();
+      
+      // Filter lists to find those where the user is a participant
+      const userLists = allLists.filter(list =>
+        list.participants.some(p => p.userId === user.tokenIdentifier)
+      );
+  
+      return userLists;
+    },
+  });
+
+export const createList = mutation({
+    args: {
+      name: v.string(),
+    },
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+  
+      await ctx.db.insert("lists", {
+        name: args.name,
+        ownerId: user.tokenIdentifier,
+        participants: [{ userId: user.tokenIdentifier, role: "editor" }],
+      });
+    },
+  });
+
+  export const editList = mutation({
+    args: {
+      listId: v.id("lists"),
+      newName: v.string(),
+    },
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+      const list = await ctx.db.get(args.listId);
+  
+      if (list?.ownerId !== user.tokenIdentifier) {
+        throw new Error("Unauthorized to edit this list");
+      }
+  
+      // Update the list name
+      await ctx.db.patch(args.listId, {
+        name: args.newName,
+      });
+    },
+  });
+
+  export const deleteList = mutation({
+    args: {
+      listId: v.id("lists"),
+    },
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+      const list = await ctx.db.get(args.listId);
+  
+     
+      if (list?.ownerId !== user.tokenIdentifier) {
+        throw new Error("Unauthorized to delete this list");
+      }
+  
+      // Delete the list
+      await ctx.db.delete(args.listId);
+    },
+  });
+
+  export const addParticipant = mutation({
+    args: {
+      listId: v.id("lists"),
+      email: v.string(),
+      role: v.union(v.literal("editor"), v.literal("viewer")),
+    },
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+      const list = await ctx.db.get(args.listId);
+  
+      // Check if the user is the owner of the list
+      if (list?.ownerId !== user.tokenIdentifier) {
+        throw new Error("Unauthorized to add participants to this list");
+      }
+  
+      // Find user by email using Clerk
+      const participant = await getUserByEmail(args.email);
+      if (!participant) {
+        throw new Error("User not found");
+      }
+  
+      
+      await ctx.db.patch(args.listId, {
+        participants: [...list?.participants, { userId: participant?.id, role: args.role }],
+      });
+    },
+  });
+
+  export const changeParticipantRole = mutation({
+    args: {
+      listId: v.id("lists"),
+      userId: v.string(),
+      newRole: v.union(v.literal("editor"), v.literal("viewer")),
+    },
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+      const list = await ctx.db.get(args.listId);
+  
+      // Check if the user is the owner of the list
+      if (list?.ownerId !== user.tokenIdentifier) {
+        throw new Error("Unauthorized to change participant roles in this list");
+      }
+  
+      // Update participant's role
+      await ctx.db.patch(args.listId, {
+        participants: list?.participants.map(p =>
+          p.userId === args.userId ? { ...p, role: args.newRole } : p
+        ),
+      });
+    },
+  });
+
+  export const removeParticipant = mutation({
+    args: {
+      listId: v.id("lists"),
+      userId: v.string(),
+    },
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+      const list = await ctx.db.get(args.listId);
+  
+     
+      if (list?.ownerId !== user.tokenIdentifier) {
+        throw new Error("Unauthorized to remove participants from this list");
+      }
+  
+      // Remove participant from the list
+      await ctx.db.patch(args.listId, {
+        participants: list?.participants.filter(p => p.userId !== args.userId),
+      });
+    },
+  });
+
 
 export const listTodos = query({
-    handler: async (ctx) => {
-        const user = await requireUser(ctx)
-        return await ctx.db.query("todos")
-        .withIndex("by_user_id", q => q.eq("userId", user.tokenIdentifier))
-        .collect()
-    }
-});
+    args: {
+      listId: v.id("lists"),
+    },
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+      const list = await ctx.db.get(args.listId);
+      if (!list?.participants.some(p => p.userId === user.tokenIdentifier)) {
+        throw new Error("Unauthorized to view todos for this list");
+      }
+      return await ctx.db.query("todos")
+        .withIndex("by_list_id", q => q.eq("listId", args.listId))
+        .collect();
+    },
+  });
 
 export const createTodo = mutation({
     args: {
-        title: v.string(),
-        description: v.string()
+      title: v.string(),
+      description: v.string(),
+      listId: v.id("lists"),
+      dueDate: v.string(), 
     },
     handler: async (ctx, args) => {
-        const user = await requireUser(ctx)
-        await ctx.db.insert("todos",{
-            title: args.title,
-            description: args.description,
-            completed: false,
-            userId: user.tokenIdentifier
-        })
+      const user = await requireUser(ctx);
+    
+      const list = await ctx.db.get(args.listId);
+
+      const isEditor = list?.participants.some(p => p.userId === user.tokenIdentifier && p.role === "editor");
+      if (!isEditor) {
+         throw new Error("Unauthorized to create todos for this list");
+      }
+      await ctx.db.insert("todos", {
+        title: args.title,
+        description: args.description,
+        completed: false,
+        listId: args.listId,
+        dueDate: args.dueDate, 
+      });
     },
-})
+});
 
 export const updateTodo = mutation({
     args: {
-        id: v.id("todos"),
-        completed: v.boolean(),
+      id: v.id("todos"),
+      completed: v.boolean(),
+      dueDate: v.optional(v.string()),
     },
-    handler: async(ctx, args) => {
-        const user = await requireUser(ctx)
-        const todo = await ctx.db.get(args.id)
-        if(todo?.userId !== user.tokenIdentifier){
-            throw new Error("Unauthorized")
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+      const todo = await ctx.db.get(args.id);
+      if (todo?.listId) {
+        const list = await ctx.db.get(todo.listId);
+  
+        // Check if the user is an editor in the list
+        const isEditor = list?.participants.some(p => p?.userId === user.tokenIdentifier && p?.role === "editor");
+        if (!isEditor) {
+          throw new Error("Unauthorized to update this todo");
         }
-        await ctx.db.patch(args.id,{
-            completed: args.completed
-        })
-    }
-})
+      }
+  
+      await ctx.db.patch(args.id, {
+        completed: args.completed,
+        dueDate: args.dueDate,
+      });
+    },
+  });
 
-export const deleteTodo = mutation({
+
+  export const deleteTodo = mutation({
     args: {
-        id: v.id("todos"),
+      id: v.id("todos"),
     },
-    handler: async(ctx, args) => {
-        const user = await requireUser(ctx)
-        const todo = await ctx.db.get(args.id)
-        if(todo?.userId !== user.tokenIdentifier){
-            throw new Error("Unauthorized")
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+      const todo = await ctx.db.get(args.id);
+      if (todo?.listId) {
+        const list = await ctx.db.get(todo.listId);
+  
+        // Check if the user is an editor in the list
+        const isEditor = list?.participants.some(p => p.userId === user.tokenIdentifier && p.role === "editor");
+        if (!isEditor) {
+          throw new Error("Unauthorized to delete this todo");
         }
-        await ctx.db.delete(args.id)
-    }
-})
+      }
+  
+      await ctx.db.delete(args.id);
+    },
+  });

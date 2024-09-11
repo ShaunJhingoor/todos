@@ -1,6 +1,6 @@
 "use client";
-import { NewToDoForm } from "./components/new-todo-form";
-import { ListToDo } from "./components/to-do-list";
+import { CreateListForm } from "./components/create-list";
+import { ListAllLists } from "./components/list-all-lists";
 import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
 import { SignInButton, UserButton, SignUpButton } from "@clerk/nextjs";
 import { useState } from "react";
@@ -70,7 +70,7 @@ export default function Home() {
                 </IconButton>
               </DialogTitle>
               <DialogContent>
-                <NewToDoForm onSuccess={handleClose}/>
+                <CreateListForm onSuccess={handleClose}/>
               </DialogContent>
             </Dialog>
             <Fab
@@ -85,7 +85,7 @@ export default function Home() {
             >
               <AddIcon />
             </Fab>
-            <ListToDo />
+            <ListAllLists />
           </main>
         </Container>
       </Authenticated>
