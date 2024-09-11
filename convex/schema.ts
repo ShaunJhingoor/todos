@@ -8,7 +8,8 @@ export default defineSchema({
         completed: v.boolean(),
         listId: v.id("lists"),
         dueDate: v.string(),
-    }).index("by_list_id",["listId"]),
+    })
+    .index("by_list_id",["listId"]),
 
     lists: defineTable({
         name: v.string(),
@@ -16,6 +17,7 @@ export default defineSchema({
         participants: v.array(
           v.object({
             userId: v.string(),
+            email: v.string(),
             role: v.union(v.literal("editor"), v.literal("viewer")),
           })
         ), 

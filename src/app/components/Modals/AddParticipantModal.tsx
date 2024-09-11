@@ -31,14 +31,14 @@ export function AddParticipantModal({ isOpen, onClose, listId }: AddParticipantM
         throw new Error("User not found");
       }
 
-      await addParticipant({ listId, userId, role });
+      await addParticipant({ listId, userId, email, role });
 
       alert("Participant added successfully!");
       setEmail("");
       onClose();
     } catch (error) {
       if (error instanceof Error) {
-        alert(`Error adding participant: ${error.message}`);
+        alert(`Error adding participant`);
       } else {
         alert("An unknown error occurred while adding the participant.");
       }

@@ -13,7 +13,7 @@ export const listUserLists = query({
     handler: async (ctx) => {
       const user = await requireUser(ctx);
 
-      // Fetch all lists and filter client-side
+      console.log(user)
       const allLists = await ctx.db.query("lists").collect();
       
       // Filter lists to find those where the user is a participant
@@ -31,11 +31,11 @@ export const createList = mutation({
     },
     handler: async (ctx, args) => {
       const user = await requireUser(ctx);
-      
+      const email = user.email || "no-reply@example.com"
       await ctx.db.insert("lists", {
         name: args.name,
         ownerId: user?.subject,
-        participants: [{ userId: user?.subject, role: "editor" }],
+        participants: [{ userId: user?.subject, email, role: "editor" }],
       });
     },
   });
@@ -106,18 +106,27 @@ export const createList = mutation({
     args: {
       listId: v.id("lists"),
       userId: v.string(),
+      email: v.string(),
       role: v.union(v.literal("editor"), v.literal("viewer")),
     },
-    handler: async (ctx, { listId, userId, role }) => {
+    handler: async (ctx, { listId, userId,email, role }) => {
       const user = await requireUser(ctx);
       const list = await ctx.db.get(listId);
   
       if (list?.ownerId != user?.subject) {
         throw new Error("Unauthorized to add participants to this list");
       }
+
+      const existingParticipant = list?.participants?.find(
+        (participant) => participant.userId == userId 
+      );
+  
+      if (existingParticipant) {
+        throw new Error("Participant already added to this list");
+      }
   
       await ctx.db.patch(listId, {
-        participants: [...(list?.participants || []), { userId, role }],
+        participants: [...(list?.participants || []), { userId, email, role }],
       });
   
       return { success: true };
