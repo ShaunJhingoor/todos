@@ -3,12 +3,22 @@ import { NewToDoForm } from "./components/new-todo-form";
 import { ListToDo } from "./components/to-do-list";
 import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
 import { SignInButton, UserButton, SignUpButton } from "@clerk/nextjs";
-
-// Material UI Imports
-import { Container, Box, Typography, Button } from '@mui/material';
+import { useState } from "react";
+import { Container, Box, Typography, Button, Dialog, DialogTitle, DialogContent, IconButton , Fab} from '@mui/material';
 import { TaskAlt, Alarm, People } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
 
 export default function Home() {
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       {/* Header */}
@@ -23,11 +33,63 @@ export default function Home() {
       <Authenticated>
         <Container maxWidth="lg" className="py-8">
           <main className="space-y-8">
+            
+            <Dialog
+              open={open}
+              onClose={handleClose}
+              maxWidth="sm"
+              fullWidth
+            >
+              <DialogTitle
+               sx={{
+                display: 'flex',
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                position: 'relative', 
+                fontSize: '1.2rem', 
+                fontWeight: 'medium', 
+                color: 'primary.main', 
+                padding: '16px 24px', 
+                textTransform: 'uppercase', 
+                letterSpacing: '0.05em', 
+              }}>
+                Add New To-Do
+                <IconButton
+                  edge="end"
+                  color="inherit"
+                  onClick={handleClose}
+                  aria-label="close"
+                  sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              <DialogContent>
+                <NewToDoForm onSuccess={handleClose}/>
+              </DialogContent>
+            </Dialog>
+            <Fab
+              color="primary"
+              aria-label="add"
+              sx={{
+                position: 'fixed',
+                bottom: 16,
+                right: 16,
+              }}
+              onClick={handleClickOpen}
+            >
+              <AddIcon />
+            </Fab>
             <ListToDo />
-            <NewToDoForm />
           </main>
         </Container>
       </Authenticated>
+
 
       {/* Unauthenticated Content */}
       <Unauthenticated>
@@ -129,10 +191,10 @@ export default function Home() {
 
       {/* Auth Loading */}
       <AuthLoading>
-        <Box className="flex items-center justify-center h-16">
-          <Typography variant="body2" className="text-gray-600">
-            Loading...
-          </Typography>
+      <Box className="flex items-center justify-center h-screen">
+          <div className="relative">
+            <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
+          </div>
         </Box>
       </AuthLoading>
     </div>
