@@ -146,7 +146,7 @@ export const createList = mutation({
       const list = await ctx.db.get(args.listId);
   
       // Check if the user is the owner of the list
-      if (list?.ownerId !== user.tokenIdentifier) {
+      if (list?.ownerId != user?.subject) {
         throw new Error("Unauthorized to change participant roles in this list");
       }
   
@@ -169,7 +169,7 @@ export const createList = mutation({
       const list = await ctx.db.get(args.listId);
   
      
-      if (list?.ownerId !== user.tokenIdentifier) {
+      if (list?.ownerId != user?.subject) {
         throw new Error("Unauthorized to remove participants from this list");
       }
   
@@ -188,7 +188,7 @@ export const listTodos = query({
     handler: async (ctx, args) => {
       const user = await requireUser(ctx);
       const list = await ctx.db.get(args.listId);
-      if (!list?.participants.some(p => p.userId === user.tokenIdentifier)) {
+      if (!list?.participants.some(p => p.userId == user?.session)) {
         throw new Error("Unauthorized to view todos for this list");
       }
       return await ctx.db.query("todos")

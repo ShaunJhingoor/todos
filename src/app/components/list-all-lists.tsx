@@ -84,8 +84,7 @@ function ListItem({
         <EditListModal
           isOpen={isEditModalOpen}
           onClose={() => setEditModalOpen(false)}
-          listId={list._id}
-          currentName={list.name}
+          list={list}
         />
       )}
     </li>
