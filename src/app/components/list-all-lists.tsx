@@ -4,8 +4,8 @@ import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 import { useUser } from "@clerk/nextjs";
 import { AddParticipantModal } from "./Modals/AddParticipantModal";
-import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material";
-
+import { Add as AddIcon, Delete as DeleteIcon ,Edit as EditIcon} from "@mui/icons-material";
+import { EditListModal } from "./Modals/EditListModal";
 interface List {
   _id: Id<"lists">;
   name: string;
@@ -38,6 +38,7 @@ function ListItem({
 }) {
   const { user } = useUser();
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
 
   return (
     <li className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
@@ -55,6 +56,14 @@ function ListItem({
             </button>
             <button
               type="button"
+              className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition"
+              onClick={() => setEditModalOpen(true)} // Open the EditListModal
+              aria-label="Edit List"
+            >
+              <EditIcon />
+            </button>
+            <button
+              type="button"
               className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition"
               onClick={() => deleteList({ listId: list._id })}
               aria-label="Delete List"
@@ -69,6 +78,14 @@ function ListItem({
           isOpen={isModalOpen}
           onClose={() => setModalOpen(false)}
           listId={list._id}
+        />
+      )}
+      {user?.id === list.ownerId && isEditModalOpen && (
+        <EditListModal
+          isOpen={isEditModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          listId={list._id}
+          currentName={list.name}
         />
       )}
     </li>
