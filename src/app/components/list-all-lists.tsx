@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
-import { useAction } from "convex/react";
-// import { clerkClient } from "@clerk/clerk-sdk-node";
-
+import { useUser } from "@clerk/nextjs";
+import { AddParticipantModal } from "./Modals/AddParticipantModal";
+import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material";
 
 interface List {
   _id: Id<"lists">;
@@ -16,108 +16,61 @@ interface List {
   }[];
 }
 
-
-
 export function ListAllLists() {
   const lists = useQuery(api.functions.listUserLists);
   const deleteList = useMutation(api.functions.deleteList);
 
   return (
-    <ul className="space-y-2">
-      {lists?.map(({ _id, name }, index) => (
-        <ListItem key={index} id={_id} name={name} deleteList={deleteList} />
+    <ul className="space-y-4">
+      {lists?.map((list) => (
+        <ListItem key={list._id} list={list} deleteList={deleteList} />
       ))}
     </ul>
   );
 }
 
 function ListItem({
-  id,
-  name,
+  list,
   deleteList,
 }: {
-  id: Id<"lists">;
-  name: string;
+  list: List;
   deleteList: (args: { listId: Id<"lists"> }) => void;
 }) {
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"editor" | "viewer">("viewer");
-
-
-  
-  const getUserIdByEmail = useAction(api.functions.getUserIdByEmail);
-  const addParticipant = useMutation(api.functions.addParticipant);
-
-  const handleAddParticipant = async () => {
-    if (!email) {
-      alert("Please enter an email address.");
-      return;
-    }
-
-    try {
-      // First, get the user ID using the action
-      const userId = await getUserIdByEmail({ email });
-      
-      if (!userId) {
-        throw new Error("User not found");
-      }
-
-      // Then, add the participant using the mutation
-      await addParticipant({ listId: id, userId, role });
-      
-      setEmail(""); // Clear email input after adding
-      alert("Participant added successfully!");
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(`Error adding participant: ${error.message}`);
-      } else {
-        alert("An unknown error occurred while adding the participant.");
-      }
-      console.error(error);
-    }
-  };
-
+  const { user } = useUser();
+  const [isModalOpen, setModalOpen] = useState(false);
 
   return (
-    <li className="w-full flex flex-col items-start gap-2 border rounded p-2">
-      <div className="flex w-full items-center gap-2">
-        <div className="flex-grow">
-          <p className="font-semibold">{name}</p>
-        </div>
-        <div className="ml-auto">
-          <button
-            type="button"
-            className="text-red-500 cursor-pointer"
-            onClick={() => deleteList({ listId: id })}
-          >
-            Remove
-          </button>
-        </div>
+    <li className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
+      <div className="flex justify-between items-center p-4">
+        <p className="text-lg font-semibold text-gray-800">{list.name}</p>
+        {user?.id === list.ownerId && (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+              onClick={() => setModalOpen(true)}
+              aria-label="Add Participant"
+            >
+              <AddIcon />
+            </button>
+            <button
+              type="button"
+              className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition"
+              onClick={() => deleteList({ listId: list._id })}
+              aria-label="Delete List"
+            >
+              <DeleteIcon />
+            </button>
+          </div>
+        )}
       </div>
-      <div className="w-full flex gap-2 mt-2">
-        <input
-          type="email"
-          placeholder="Enter email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="flex-grow p-2 border rounded"
+      {user?.id === list.ownerId && isModalOpen && (
+        <AddParticipantModal
+          isOpen={isModalOpen}
+          onClose={() => setModalOpen(false)}
+          listId={list._id}
         />
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value as "editor" | "viewer")}
-          className="p-2 border rounded"
-        >
-          <option value="viewer">Viewer</option>
-          <option value="editor">Editor</option>
-        </select>
-        <button
-          type="button"
-          className="bg-blue-500 text-white p-2 rounded"
-          onClick={handleAddParticipant}
-        >
-          Add
-        </button>
-      </div>
+      )}
     </li>
   );
 }

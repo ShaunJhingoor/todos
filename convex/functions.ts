@@ -18,7 +18,7 @@ export const listUserLists = query({
       
       // Filter lists to find those where the user is a participant
       const userLists = allLists.filter(list =>
-        list.participants.some(p => p.userId === user.tokenIdentifier)
+        list.participants.some(p => p.userId == user?.subject)
       );
   
       return userLists;
@@ -34,8 +34,8 @@ export const createList = mutation({
       
       await ctx.db.insert("lists", {
         name: args.name,
-        ownerId: user.tokenIdentifier,
-        participants: [{ userId: user.tokenIdentifier, role: "editor" }],
+        ownerId: user?.subject,
+        participants: [{ userId: user?.subject, role: "editor" }],
       });
     },
   });
@@ -49,7 +49,7 @@ export const createList = mutation({
       const user = await requireUser(ctx);
       const list = await ctx.db.get(args.listId);
   
-      if (list?.ownerId !== user.tokenIdentifier) {
+      if (list?.ownerId != user?.subject) {
         throw new Error("Unauthorized to edit this list");
       }
   
@@ -69,7 +69,7 @@ export const createList = mutation({
       const list = await ctx.db.get(args.listId);
   
      
-      if (list?.ownerId !== user.tokenIdentifier) {
+      if (list?.ownerId != user?.subject) {
         throw new Error("Unauthorized to delete this list");
       }
   
@@ -112,7 +112,7 @@ export const createList = mutation({
       const user = await requireUser(ctx);
       const list = await ctx.db.get(listId);
   
-      if (list?.ownerId !== user.tokenIdentifier) {
+      if (list?.ownerId != user?.subject) {
         throw new Error("Unauthorized to add participants to this list");
       }
   
