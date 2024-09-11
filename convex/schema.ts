@@ -18,8 +18,9 @@ export default defineSchema({
             userId: v.string(),
             role: v.union(v.literal("editor"), v.literal("viewer")),
           })
-        ), // Array of participants with roles
+        ), 
       })
       .index("by_owner_id", ["ownerId"]),
+
 })
 

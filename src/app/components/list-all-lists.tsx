@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
+import { useAction } from "convex/react";
+// import { clerkClient } from "@clerk/clerk-sdk-node";
 
-// Define the type for the list object
+
 interface List {
   _id: Id<"lists">;
   name: string;
@@ -13,6 +15,8 @@ interface List {
     role: "editor" | "viewer";
   }[];
 }
+
+
 
 export function ListAllLists() {
   const lists = useQuery(api.functions.listUserLists);
@@ -38,6 +42,10 @@ function ListItem({
 }) {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"editor" | "viewer">("viewer");
+
+
+  
+  const getUserIdByEmail = useAction(api.functions.getUserIdByEmail);
   const addParticipant = useMutation(api.functions.addParticipant);
 
   const handleAddParticipant = async () => {
@@ -47,13 +55,28 @@ function ListItem({
     }
 
     try {
-      await addParticipant({ listId: id, email, role });
+      // First, get the user ID using the action
+      const userId = await getUserIdByEmail({ email });
+      
+      if (!userId) {
+        throw new Error("User not found");
+      }
+
+      // Then, add the participant using the mutation
+      await addParticipant({ listId: id, userId, role });
+      
       setEmail(""); // Clear email input after adding
+      alert("Participant added successfully!");
     } catch (error) {
-      alert(`Error adding participant`);
-      console.log(error)
+      if (error instanceof Error) {
+        alert(`Error adding participant: ${error.message}`);
+      } else {
+        alert("An unknown error occurred while adding the participant.");
+      }
+      console.error(error);
     }
   };
+
 
   return (
     <li className="w-full flex flex-col items-start gap-2 border rounded p-2">

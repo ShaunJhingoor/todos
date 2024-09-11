@@ -1,12 +1,18 @@
 import { mutation, query } from "./_generated/server"
 import {v} from "convex/values"
 import { requireUser } from "./helper";
-import { getUserByEmail } from "./helper";
+import { createClerkClient } from "@clerk/clerk-sdk-node";
+import { action } from "./_generated/server";
+
+// Initialize Clerk client with your secret key
+const clerkClient = createClerkClient({
+  secretKey: process.env.CLERK_SECRET_KEY,
+});
 
 export const listUserLists = query({
     handler: async (ctx) => {
       const user = await requireUser(ctx);
-  
+
       // Fetch all lists and filter client-side
       const allLists = await ctx.db.query("lists").collect();
       
@@ -25,7 +31,7 @@ export const createList = mutation({
     },
     handler: async (ctx, args) => {
       const user = await requireUser(ctx);
-  
+      
       await ctx.db.insert("lists", {
         name: args.name,
         ownerId: user.tokenIdentifier,
@@ -72,33 +78,53 @@ export const createList = mutation({
     },
   });
 
+  
+  export const getUserIdByEmail = action({
+    args: { email: v.string() },
+    handler: async (ctx, { email }) => {
+      try {
+        const response = await clerkClient.users.getUserList({
+          emailAddress: [email],
+        });
+        console.log("response:", response)
+        const users = response.data;
+        console.log("users:", users)
+        if (Array.isArray(users) && users.length > 0) {
+          return users[0].id;
+        } else {
+          throw new Error("User not found");
+        }
+      } catch (error) {
+        console.error("Error fetching user ID by email:", error);
+        throw new Error("Failed to fetch user ID by email");
+      }
+    },
+  });
+  
+  // Mutation to add participant
   export const addParticipant = mutation({
     args: {
       listId: v.id("lists"),
-      email: v.string(),
+      userId: v.string(),
       role: v.union(v.literal("editor"), v.literal("viewer")),
     },
-    handler: async (ctx, args) => {
+    handler: async (ctx, { listId, userId, role }) => {
       const user = await requireUser(ctx);
-      const list = await ctx.db.get(args.listId);
+      const list = await ctx.db.get(listId);
   
-      // Check if the user is the owner of the list
       if (list?.ownerId !== user.tokenIdentifier) {
         throw new Error("Unauthorized to add participants to this list");
       }
   
-      // Find user by email using Clerk
-      const participant = await getUserByEmail(args.email);
-      if (!participant) {
-        throw new Error("User not found");
-      }
-  
-      
-      await ctx.db.patch(args.listId, {
-        participants: [...list?.participants, { userId: participant?.id, role: args.role }],
+      await ctx.db.patch(listId, {
+        participants: [...(list?.participants || []), { userId, role }],
       });
+  
+      return { success: true };
     },
   });
+  
+
 
   export const changeParticipantRole = mutation({
     args: {
