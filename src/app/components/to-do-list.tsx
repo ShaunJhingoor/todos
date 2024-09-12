@@ -6,7 +6,7 @@ import { Id } from '../../../convex/_generated/dataModel';
 import { useMutation } from 'convex/react';
 import { Delete as DeleteIcon, Edit as EditIcon,} from "@mui/icons-material";
 import { useUser } from '@clerk/nextjs';
-
+import { EditTodoModal } from './Modals/EditToDoModal';
 
 interface TodoListProps {
   listId: Id<'lists'>;
@@ -43,6 +43,7 @@ export function TodoList({ listId }: TodoListProps) {
     const markCompleted = useMutation(api.functions.updateTodoCompletionStatus);
     const deleteTodo = useMutation(api.functions.deleteTodo);
     const {user} = useUser()
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const list = useQuery(api.functions.getListById, { id: listId as Id<"lists"> });
     const isEditor = list?.participants.some(participant => participant.userId === user?.id && participant.role === "editor");
@@ -64,91 +65,99 @@ export function TodoList({ listId }: TodoListProps) {
     };
   
     return (
-        <Card
-          className="shadow-lg rounded-xl overflow-hidden"
-          sx={{
-            background: 'linear-gradient(135deg, #f3f4f6, #e2e8f0)',
-            border: '1px solid #e0e0e0',
-            marginTop: '2rem',
-            transition: 'transform 0.2s',
-            '&:hover': {
-              transform: 'scale(1.02)',
-              boxShadow: '0 10px 20px rgba(0, 0, 0, 0.12)',
-            },
-          }}
-        >
-          <CardContent className="flex justify-between items-center p-4">
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: 'bold',
-                  color: '#1f2937',
-                  fontFamily: 'Roboto, sans-serif',
-                  letterSpacing: '0.5px',
-                  textTransform: 'capitalize',
-                  mb: 0.5,
-                }}
-              >
-                {todo.title}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: '#4b5563',
-                  fontSize: '0.875rem',
-                  maxWidth: '15rem',
-                  wordWrap: 'break-word',
-                }}
-              >
-                {todo.description}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: '#6b7280', fontSize: '0.75rem' }}
-              >
-                Due Date: {todo.dueDate}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: '#6b7280', fontSize: '0.75rem' }}
-              >
-                Expected Time: {todo.expectedTime} Hours
-              </Typography>
-            </Box>
-            <div className="flex items-center gap-2">
-              <Tooltip title="Mark as Completed">
-                <Checkbox
-                  checked={todo.completed}
-                  onChange={isEditor ? handleComplete : undefined} 
-                  aria-label="Mark as Completed"
-                  color={todo.completed ? 'success' : 'default'}
-                  disabled={!isEditor} 
-                />
-              </Tooltip>
-              {isEditor && (
-                <>
-                  <Tooltip title="Edit Todo">
-                    <IconButton
-                      color="secondary"
-                      aria-label="Edit Todo"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete Todo">
-                    <IconButton
-                      color="error"
-                      onClick={handleDelete}
-                      aria-label="Delete Todo"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                </>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <>
+          <Card
+            className="shadow-lg rounded-xl overflow-hidden"
+            sx={{
+              background: 'linear-gradient(135deg, #f3f4f6, #e2e8f0)',
+              border: '1px solid #e0e0e0',
+              marginTop: '2rem',
+              transition: 'transform 0.2s',
+              '&:hover': {
+                transform: 'scale(1.02)',
+                boxShadow: '0 10px 20px rgba(0, 0, 0, 0.12)',
+              },
+            }}
+          >
+            <CardContent className="flex justify-between items-center p-4">
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#1f2937',
+                    fontFamily: 'Roboto, sans-serif',
+                    letterSpacing: '0.5px',
+                    textTransform: 'capitalize',
+                    mb: 0.5,
+                  }}
+                >
+                  {todo.title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#4b5563',
+                    fontSize: '0.875rem',
+                    maxWidth: '15rem',
+                    wordWrap: 'break-word',
+                  }}
+                >
+                  {todo.description}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: '#6b7280', fontSize: '0.75rem' }}
+                >
+                  Due Date: {todo.dueDate}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: '#6b7280', fontSize: '0.75rem' }}
+                >
+                  Expected Time: {todo.expectedTime} Hours
+                </Typography>
+              </Box>
+              <div className="flex items-center gap-2">
+                <Tooltip title="Mark as Completed">
+                  <Checkbox
+                    checked={todo.completed}
+                    onChange={isEditor ? handleComplete : undefined}
+                    aria-label="Mark as Completed"
+                    color={todo.completed ? 'success' : 'default'}
+                    disabled={!isEditor}
+                  />
+                </Tooltip>
+                {isEditor && (
+                  <>
+                    <Tooltip title="Edit Todo">
+                      <IconButton
+                        color="secondary"
+                        aria-label="Edit Todo"
+                        onClick={() => setIsModalOpen(true)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete Todo">
+                      <IconButton
+                        color="error"
+                        aria-label="Delete Todo"
+                        onClick={handleDelete}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+          <EditTodoModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            todo={todo}
+          />
+        </>
       );
     }

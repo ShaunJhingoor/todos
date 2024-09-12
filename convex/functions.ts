@@ -252,7 +252,7 @@ export const listTodos = query({
       description: v.string(),
       listId: v.id("lists"),
       dueDate: v.string(),
-      expectedTime: v.string(), // Correctly include expectedTime here
+      expectedTime: v.string(), 
     },
     handler: async (ctx, args) => {
       const user = await requireUser(ctx);
@@ -291,7 +291,7 @@ export const listTodos = query({
         }
       }
   
-      // Update only the completed status
+
       await ctx.db.patch(args.id, {
         completed: args.completed,
       });
