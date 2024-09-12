@@ -12,6 +12,8 @@ import { Card, CardContent, Typography, Box } from '@mui/material';
 import { ExitToApp as LeaveIcon } from "@mui/icons-material";
 import ParticipantsPopover from "./ParticipantPopUp";
 import { Visibility as VisibilityIcon } from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
+
 
 interface List {
   _id: Id<"lists">;
@@ -27,6 +29,7 @@ interface List {
 export function ListAllLists() {
   const lists = useQuery(api.functions.listUserLists);
   const deleteList = useMutation(api.functions.deleteList);
+ 
 
   return (
     <ul className="space-y-4">
@@ -44,6 +47,7 @@ function ListItem({
   list: List;
   deleteList: (args: { listId: Id<"lists"> }) => void;
 }) {
+  const router = useRouter()
   const { user } = useUser();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
@@ -51,6 +55,9 @@ function ListItem({
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const leaveList = useMutation(api.functions.leaveList);
+  const handleNavigateToList = () => {
+    router.push(`/List/${list._id}`); 
+  };
 
   const handleLeaveList = async () => {
     try {
@@ -82,8 +89,10 @@ function ListItem({
         '&:hover': {
           transform: 'scale(1.02)',
           boxShadow: '0 10px 20px rgba(0, 0, 0, 0.12)',
-        }
+        },
+        cursor: 'pointer'
       }}
+      onClick={handleNavigateToList}
     >
       <CardContent className="flex justify-between items-center p-4">
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
