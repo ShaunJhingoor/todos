@@ -92,7 +92,6 @@ function ListItem({
         },
         cursor: 'pointer'
       }}
-      onClick={handleNavigateToList}
     >
       <CardContent className="flex justify-between items-center p-4">
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -106,6 +105,7 @@ function ListItem({
               textTransform: 'capitalize',
               mb: 0.5
             }}
+            onClick={handleNavigateToList}
           >
             {list.name}
           </Typography>
@@ -115,6 +115,7 @@ function ListItem({
               color: '#4b5563', 
               fontSize: '0.875rem' 
             }}
+            onClick={handleNavigateToList}
           >
             {list.participants.length} Participants
           </Typography>

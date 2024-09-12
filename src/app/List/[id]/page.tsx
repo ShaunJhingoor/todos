@@ -55,7 +55,7 @@ const ToDoHome = () => {
             {list.name}
           </h1>
         </div>
-        <div style={{ maxWidth: '60rem',  margin: '0 auto' }}>
+        <div style={{ maxWidth: '60rem', margin: '0 auto' }}>
         <TodoList listId={list?._id}/>
         </div>
         <Fab

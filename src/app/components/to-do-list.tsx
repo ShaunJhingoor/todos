@@ -4,7 +4,8 @@ import { api } from '../../../convex/_generated/api';
 import { useQuery } from 'convex/react';
 import { Id } from '../../../convex/_generated/dataModel';
 import { useMutation } from 'convex/react';
-import { Delete as DeleteIcon, Edit as EditIcon, Check as CheckIcon} from "@mui/icons-material";
+import { Delete as DeleteIcon, Edit as EditIcon,} from "@mui/icons-material";
+import { useUser } from '@clerk/nextjs';
 
 
 interface TodoListProps {
@@ -41,6 +42,10 @@ export function TodoList({ listId }: TodoListProps) {
  function TodoItem({ todo, listId }: TodoItemProps) {
     const markCompleted = useMutation(api.functions.updateTodoCompletionStatus);
     const deleteTodo = useMutation(api.functions.deleteTodo);
+    const {user} = useUser()
+
+    const list = useQuery(api.functions.getListById, { id: listId as Id<"lists"> });
+    const isEditor = list?.participants.some(participant => participant.userId === user?.id && participant.role === "editor");
   
     const handleComplete = async () => {
       try {
@@ -74,7 +79,6 @@ export function TodoList({ listId }: TodoListProps) {
         >
           <CardContent className="flex justify-between items-center p-4">
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                
               <Typography
                 variant="h6"
                 sx={{
@@ -90,8 +94,12 @@ export function TodoList({ listId }: TodoListProps) {
               </Typography>
               <Typography
                 variant="body2"
-                sx={{ color: '#4b5563', fontSize: '0.875rem', maxWidth: '15rem',
-                wordWrap: 'break-word'}}
+                sx={{
+                  color: '#4b5563',
+                  fontSize: '0.875rem',
+                  maxWidth: '15rem',
+                  wordWrap: 'break-word',
+                }}
               >
                 {todo.description}
               </Typography>
@@ -112,28 +120,33 @@ export function TodoList({ listId }: TodoListProps) {
               <Tooltip title="Mark as Completed">
                 <Checkbox
                   checked={todo.completed}
-                  onChange={handleComplete}
+                  onChange={isEditor ? handleComplete : undefined} 
                   aria-label="Mark as Completed"
-                  color={todo.completed ? "success" : "default"}
+                  color={todo.completed ? 'success' : 'default'}
+                  disabled={!isEditor} 
                 />
               </Tooltip>
-              <Tooltip title="Edit Todo">
-                <IconButton
-                  color="secondary"
-                  aria-label="Edit Todo"
-                >
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Delete Todo">
-                <IconButton
-                  color="error"
-                  onClick={handleDelete}
-                  aria-label="Delete Todo"
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
+              {isEditor && (
+                <>
+                  <Tooltip title="Edit Todo">
+                    <IconButton
+                      color="secondary"
+                      aria-label="Edit Todo"
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete Todo">
+                    <IconButton
+                      color="error"
+                      onClick={handleDelete}
+                      aria-label="Delete Todo"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
