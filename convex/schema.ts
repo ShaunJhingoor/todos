@@ -8,6 +8,7 @@ export default defineSchema({
         completed: v.boolean(),
         listId: v.id("lists"),
         dueDate: v.string(),
+        expectedTime: v.string(),
     })
     .index("by_list_id",["listId"]),
 

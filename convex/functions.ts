@@ -25,6 +25,24 @@ export const listUserLists = query({
     },
   });
 
+  export const getListById = query({
+    args: {
+      id: v.id("lists"),
+    },
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+  
+  
+      const list = await ctx.db.get(args.id);
+  
+      if (list && list.participants.some(p => p.userId === user?.subject)) {
+        return list;
+      } else {
+        throw new Error("Unauthorized or list not found");
+      }
+    },
+  });
+
 export const createList = mutation({
     args: {
       name: v.string(),
@@ -224,7 +242,7 @@ export const listTodos = query({
     handler: async (ctx, args) => {
       const user = await requireUser(ctx);
       const list = await ctx.db.get(args.listId);
-      if (!list?.participants.some(p => p.userId == user?.session)) {
+      if (!list?.participants.some(p => p.userId == user?.subject)) {
         throw new Error("Unauthorized to view todos for this list");
       }
       return await ctx.db.query("todos")
@@ -233,57 +251,88 @@ export const listTodos = query({
     },
   });
 
-export const createTodo = mutation({
+  export const createTodo = mutation({
     args: {
       title: v.string(),
       description: v.string(),
       listId: v.id("lists"),
-      dueDate: v.string(), 
+      dueDate: v.string(),
+      expectedTime: v.string(), // Correctly include expectedTime here
     },
     handler: async (ctx, args) => {
       const user = await requireUser(ctx);
-    
       const list = await ctx.db.get(args.listId);
-
-      const isEditor = list?.participants.some(p => p.userId === user.tokenIdentifier && p.role === "editor");
+  
+      const isEditor = list?.participants.some(p => p.userId === user?.subject && p.role === "editor");
       if (!isEditor) {
-         throw new Error("Unauthorized to create todos for this list");
+        throw new Error("Unauthorized to create todos for this list");
       }
+      
       await ctx.db.insert("todos", {
         title: args.title,
         description: args.description,
         completed: false,
         listId: args.listId,
-        dueDate: args.dueDate, 
+        dueDate: args.dueDate,
+        expectedTime: args.expectedTime, 
       });
     },
-});
+  });
 
-export const updateTodo = mutation({
+  export const updateTodoCompletionStatus = mutation({
     args: {
       id: v.id("todos"),
       completed: v.boolean(),
-      dueDate: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
       const user = await requireUser(ctx);
       const todo = await ctx.db.get(args.id);
+  
       if (todo?.listId) {
         const list = await ctx.db.get(todo.listId);
-  
-        // Check if the user is an editor in the list
-        const isEditor = list?.participants.some(p => p?.userId === user.tokenIdentifier && p?.role === "editor");
+        const isEditor = list?.participants.some(p => p.userId === user?.subject && p.role === "editor");
         if (!isEditor) {
           throw new Error("Unauthorized to update this todo");
         }
       }
   
+      // Update only the completed status
       await ctx.db.patch(args.id, {
         completed: args.completed,
-        dueDate: args.dueDate,
       });
     },
   });
+
+  export const updateTodoDetails = mutation({
+    args: {
+      id: v.id("todos"),
+      title: v.optional(v.string()),
+      description: v.optional(v.string()),
+      dueDate: v.optional(v.string()),
+      expectedTime: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+      const todo = await ctx.db.get(args.id);
+  
+      if (todo?.listId) {
+        const list = await ctx.db.get(todo.listId);
+        const isEditor = list?.participants.some(p => p.userId === user?.subject && p.role === "editor");
+        if (!isEditor) {
+          throw new Error("Unauthorized to update this todo");
+        }
+      }
+  
+      // Update all fields provided in the arguments
+      await ctx.db.patch(args.id, {
+        title: args.title,
+        description: args.description,
+        dueDate: args.dueDate,
+        expectedTime: args.expectedTime,
+      });
+    },
+  });
+  
 
 
   export const deleteTodo = mutation({
