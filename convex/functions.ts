@@ -180,6 +180,42 @@ export const createList = mutation({
     },
   });
 
+  export const leaveList = mutation({
+    args: {
+      listId: v.id("lists"),
+    },
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+      const list = await ctx.db.get(args.listId);
+  
+      // Check if the list exists
+      if (!list) {
+        throw new Error("List not found");
+      }
+  
+      // Find the participant
+      const participantIndex = list.participants.findIndex(
+        (p) => p.userId === user?.subject
+      );
+  
+      if (participantIndex === -1) {
+        throw new Error("User is not a participant of this list");
+      }
+  
+      // If the user is the owner of the list, they cannot leave without deleting the list
+      if (list.ownerId === user?.subject) {
+        throw new Error("Owner cannot leave the list. Please delete the list if needed.");
+      }
+  
+      // Remove the user from the participants list
+      await ctx.db.patch(args.listId, {
+        participants: list.participants.filter(
+          (p) => p.userId !== user?.subject
+        ),
+      });
+    },
+  });
+  
 
 export const listTodos = query({
     args: {

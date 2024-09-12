@@ -4,11 +4,14 @@ import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 import { useUser } from "@clerk/nextjs";
 import { AddParticipantModal } from "./Modals/AddParticipantModal";
-import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
+import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon, } from "@mui/icons-material";
 import { EditListModal } from "./Modals/EditListModal";
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { Card, CardContent, Typography, Box } from '@mui/material';
+import { ExitToApp as LeaveIcon } from "@mui/icons-material";
+import ParticipantsPopover from "./ParticipantPopUp";
+import { Visibility as VisibilityIcon } from '@mui/icons-material';
 
 interface List {
   _id: Id<"lists">;
@@ -16,6 +19,7 @@ interface List {
   ownerId: string;
   participants: {
     userId: string;
+    email: string;
     role: "editor" | "viewer";
   }[];
 }
@@ -43,6 +47,30 @@ function ListItem({
   const { user } = useUser();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
+  const leaveList = useMutation(api.functions.leaveList);
+
+  const handleLeaveList = async () => {
+    try {
+      await leaveList({ listId: list._id });
+    } catch (error) {
+      alert("Error leaving the list");
+      console.error("Error leaving the list:", error);
+    }
+  };
+
+  const handlePopoverClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+    setPopoverOpen(true);
+  };
+
+  const handlePopoverClose = () => {
+    setPopoverOpen(false);
+  };
+
+  const isEditor = list.participants.some(participant => participant.userId === user?.id && participant.role === "editor");
 
   return (
     <Card 
@@ -82,38 +110,69 @@ function ListItem({
             {list.participants.length} Participants
           </Typography>
         </Box>
-        {user?.id === list.ownerId && (
-          <div className="flex items-center gap-2">
-            <Tooltip title="Add Participant">
+        <div className="flex items-center gap-2">
+          
+          {isEditor && (
+            <Tooltip title="View Participants">
               <IconButton
                 color="primary"
-                onClick={() => setModalOpen(true)}
-                aria-label="Add Participant"
+                onClick={handlePopoverClick}
+                aria-label="View Participants"
               >
-                <AddIcon />
+                <VisibilityIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Edit List">
+          )}
+          {user?.id !== list.ownerId && (
+            <Tooltip title="Leave List">
               <IconButton
-                color="secondary"
-                onClick={() => setEditModalOpen(true)}
-                aria-label="Edit List"
+                color="warning"
+                onClick={handleLeaveList}
+                aria-label="Leave List"
               >
-                <EditIcon />
+                <LeaveIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Delete List">
-              <IconButton
-                color="error"
-                onClick={() => deleteList({ listId: list._id })}
-                aria-label="Delete List"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </div>
-        )}
+          )}
+          {user?.id === list.ownerId && (
+            <>
+              <Tooltip title="Add Participant">
+                <IconButton
+                  color="primary"
+                  onClick={() => setModalOpen(true)}
+                  aria-label="Add Participant"
+                >
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Edit List">
+                <IconButton
+                  color="secondary"
+                  onClick={() => setEditModalOpen(true)}
+                  aria-label="Edit List"
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Delete List">
+                <IconButton
+                  color="error"
+                  onClick={() => deleteList({ listId: list._id })}
+                  aria-label="Delete List"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
+        </div>
       </CardContent>
+      <ParticipantsPopover
+        open={popoverOpen}
+        anchorEl={anchorEl}
+        onClose={handlePopoverClose}
+        list={list}      
+      />
       {user?.id === list.ownerId && isModalOpen && (
         <AddParticipantModal
           isOpen={isModalOpen}
