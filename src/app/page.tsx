@@ -4,7 +4,7 @@ import { ListAllLists } from "./components/list-all-lists";
 import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
 import { SignInButton, UserButton, SignUpButton } from "@clerk/nextjs";
 import { useState } from "react";
-import { Container, Box, Typography, Button, Dialog, DialogTitle, DialogContent, IconButton , Fab} from '@mui/material';
+import { Container, Box, Typography, Button, Dialog, DialogTitle, DialogContent, IconButton, Fab } from '@mui/material';
 import { TaskAlt, Alarm, People } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
@@ -19,8 +19,9 @@ export default function Home() {
   const handleClose = () => {
     setOpen(false);
   };
+
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-200 text-gray-900">
       {/* Header */}
       <header className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md py-4">
         <Container maxWidth="lg" className="flex items-center justify-between">
@@ -31,48 +32,51 @@ export default function Home() {
 
       {/* Authenticated Content */}
       <Authenticated>
-        <Container maxWidth="lg" className="py-8">
+        <Container maxWidth="lg" >
           <main className="space-y-8">
-            
-            <Dialog
-              open={open}
-              onClose={handleClose}
-              maxWidth="sm"
-              fullWidth
-            >
-              <DialogTitle
-               sx={{
-                display: 'flex',
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                position: 'relative', 
-                fontSize: '1.2rem', 
-                fontWeight: 'medium', 
-                color: 'primary.main', 
-                padding: '16px 24px', 
-                textTransform: 'uppercase', 
-                letterSpacing: '0.05em', 
-              }}>
-                Add New To-Do
-                <IconButton
-                  edge="end"
-                  color="inherit"
-                  onClick={handleClose}
-                  aria-label="close"
-                  sx={{
-                    position: 'absolute',
-                    right: 8,
-                    top: 8,
-                    color: (theme) => theme.palette.grey[500],
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </DialogTitle>
-              <DialogContent>
-                <CreateListForm onSuccess={handleClose}/>
-              </DialogContent>
-            </Dialog>
+          <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+        <DialogTitle
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "relative",
+            fontSize: "1.2rem",
+            fontWeight: "medium",
+            color: "primary.main",
+            padding: "16px 24px",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+            background: "linear-gradient(135deg, #f3f4f6, #e2e8f0)", 
+            borderBottom: "1px solid #e0e0e0",
+          }}
+        >
+          Add New List 
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={handleClose}
+            aria-label="close"
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            padding: "24px",
+            background:  "linear-gradient(135deg, #f3f4f6, #e2e8f0)",
+            boxShadow: "inset 0 1px 2px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <CreateListForm onSuccess={handleClose} />
+        </DialogContent>
+      </Dialog>
             <Fab
               color="primary"
               aria-label="add"
@@ -90,7 +94,6 @@ export default function Home() {
         </Container>
       </Authenticated>
 
-
       {/* Unauthenticated Content */}
       <Unauthenticated>
         {/* Hero Section */}
@@ -105,32 +108,32 @@ export default function Home() {
             <div className="space-x-4 mt-[1vh]">
               <SignInButton>
                 <Button
-                    variant="contained"
-                    sx={{
-                      bgcolor: '#2196F3', // Blue color for Sign In
-                      '&:hover': {
-                        bgcolor: '#1976D2', // Darker blue for hover effect
-                      },
-                    }}
-                    className="shadow-lg"
-                  >
-                    Sign In
+                  variant="contained"
+                  sx={{
+                    bgcolor: '#2196F3',
+                    '&:hover': {
+                      bgcolor: '#1976D2',
+                    },
+                  }}
+                  className="shadow-lg"
+                >
+                  Sign In
                 </Button>
               </SignInButton>
               <SignUpButton>
-              <Button
-                variant="contained"
-                sx={{
-                  bgcolor: '#9C27B0', // Purple color for Sign Up
-                  '&:hover': {
-                    bgcolor: '#7B1FA2', // Darker purple for hover effect
-                  },
-                }}
-                className="shadow-lg"
-              >
-                Sign Up
-              </Button>
-            </SignUpButton>
+                <Button
+                  variant="contained"
+                  sx={{
+                    bgcolor: '#9C27B0',
+                    '&:hover': {
+                      bgcolor: '#7B1FA2',
+                    },
+                  }}
+                  className="shadow-lg"
+                >
+                  Sign Up
+                </Button>
+              </SignUpButton>
             </div>
           </Box>
         </section>
@@ -191,7 +194,7 @@ export default function Home() {
 
       {/* Auth Loading */}
       <AuthLoading>
-      <Box className="flex items-center justify-center h-screen">
+        <Box className="flex items-center justify-center h-screen">
           <div className="relative">
             <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
           </div>

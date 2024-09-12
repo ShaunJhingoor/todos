@@ -4,8 +4,12 @@ import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 import { useUser } from "@clerk/nextjs";
 import { AddParticipantModal } from "./Modals/AddParticipantModal";
-import { Add as AddIcon, Delete as DeleteIcon ,Edit as EditIcon} from "@mui/icons-material";
+import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import { EditListModal } from "./Modals/EditListModal";
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import { Card, CardContent, Typography, Box } from '@mui/material';
+
 interface List {
   _id: Id<"lists">;
   name: string;
@@ -41,38 +45,75 @@ function ListItem({
   const [isEditModalOpen, setEditModalOpen] = useState(false);
 
   return (
-    <li className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
-      <div className="flex justify-between items-center p-4">
-        <p className="text-lg font-semibold text-gray-800">{list.name}</p>
+    <Card 
+      className="shadow-lg rounded-xl overflow-hidden"
+      sx={{
+        background: 'linear-gradient(135deg, #f3f4f6, #e2e8f0)',
+        border: '1px solid #e0e0e0',
+        transition: 'transform 0.2s',
+        '&:hover': {
+          transform: 'scale(1.02)',
+          boxShadow: '0 10px 20px rgba(0, 0, 0, 0.12)',
+        }
+      }}
+    >
+      <CardContent className="flex justify-between items-center p-4">
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography 
+            variant="h6" 
+            sx={{
+              fontWeight: 'bold',
+              color: '#1f2937',
+              fontFamily: 'Roboto, sans-serif',
+              letterSpacing: '0.5px',
+              textTransform: 'capitalize',
+              mb: 0.5
+            }}
+          >
+            {list.name}
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: '#4b5563', 
+              fontSize: '0.875rem' 
+            }}
+          >
+            {list.participants.length} Participants
+          </Typography>
+        </Box>
         {user?.id === list.ownerId && (
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-              onClick={() => setModalOpen(true)}
-              aria-label="Add Participant"
-            >
-              <AddIcon />
-            </button>
-            <button
-              type="button"
-              className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition"
-              onClick={() => setEditModalOpen(true)} // Open the EditListModal
-              aria-label="Edit List"
-            >
-              <EditIcon />
-            </button>
-            <button
-              type="button"
-              className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition"
-              onClick={() => deleteList({ listId: list._id })}
-              aria-label="Delete List"
-            >
-              <DeleteIcon />
-            </button>
+            <Tooltip title="Add Participant">
+              <IconButton
+                color="primary"
+                onClick={() => setModalOpen(true)}
+                aria-label="Add Participant"
+              >
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Edit List">
+              <IconButton
+                color="secondary"
+                onClick={() => setEditModalOpen(true)}
+                aria-label="Edit List"
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete List">
+              <IconButton
+                color="error"
+                onClick={() => deleteList({ listId: list._id })}
+                aria-label="Delete List"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
           </div>
         )}
-      </div>
+      </CardContent>
       {user?.id === list.ownerId && isModalOpen && (
         <AddParticipantModal
           isOpen={isModalOpen}
@@ -87,6 +128,6 @@ function ListItem({
           list={list}
         />
       )}
-    </li>
+    </Card>
   );
 }
