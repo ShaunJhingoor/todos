@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Checkbox, Typography , Card, Box, CardContent, Tooltip, IconButton, } from '@mui/material';
 import { api } from '../../../convex/_generated/api';
 import { useQuery } from 'convex/react';
@@ -32,7 +32,7 @@ export function TodoList({ listId }: TodoListProps) {
   return (
     <ul className="space-y-4">
     {todos?.map((todo) => (
-        <TodoItem todo={todo} listId={listId} />
+        <TodoItem todo={todo} listId={listId} key={todo?._id}/>
     ))}
     </ul>
   );

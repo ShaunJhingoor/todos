@@ -40,7 +40,7 @@ interface PendingChanges {
 
 export function EditListModal({ isOpen, onClose, list }: EditListModalProps) {
   const [newName, setNewName] = useState(list.name);
-  const [participants, setParticipants] = useState<Participant[]>(list.participants);
+  const participants = list.participants
   const [pendingChanges, setPendingChanges] = useState<PendingChanges>({
     updatedRoles: {},
     removedUsers: [],
