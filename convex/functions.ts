@@ -4,7 +4,7 @@ import { requireUser } from "./helper";
 import { createClerkClient } from "@clerk/clerk-sdk-node";
 import { action } from "./_generated/server";
 
-// Initialize Clerk client with your secret key
+
 const clerkClient = createClerkClient({
   secretKey: process.env.CLERK_SECRET_KEY,
 });
@@ -30,16 +30,11 @@ export const listUserLists = query({
       id: v.id("lists"),
     },
     handler: async (ctx, args) => {
-      const user = await requireUser(ctx);
-  
   
       const list = await ctx.db.get(args.id);
-  
-      if (list && list.participants.some(p => p.userId === user?.subject)) {
-        return list;
-      } else {
-        throw new Error("Unauthorized or list not found");
-      }
+ 
+      return list;
+     
     },
   });
 
