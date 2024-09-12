@@ -114,7 +114,7 @@ export const createList = mutation({
     },
   });
   
-  // Mutation to add participant
+
   export const addParticipant = mutation({
     args: {
       listId: v.id("lists"),
@@ -158,7 +158,7 @@ export const createList = mutation({
       const user = await requireUser(ctx);
       const list = await ctx.db.get(args.listId);
   
-      // Check if the user is the owner of the list
+  
       if (list?.ownerId != user?.subject) {
         throw new Error("Unauthorized to change participant roles in this list");
       }
@@ -201,12 +201,12 @@ export const createList = mutation({
       const user = await requireUser(ctx);
       const list = await ctx.db.get(args.listId);
   
-      // Check if the list exists
+ 
       if (!list) {
         throw new Error("List not found");
       }
   
-      // Find the participant
+
       const participantIndex = list.participants.findIndex(
         (p) => p.userId === user?.subject
       );
@@ -215,12 +215,12 @@ export const createList = mutation({
         throw new Error("User is not a participant of this list");
       }
   
-      // If the user is the owner of the list, they cannot leave without deleting the list
+ 
       if (list.ownerId === user?.subject) {
         throw new Error("Owner cannot leave the list. Please delete the list if needed.");
       }
   
-      // Remove the user from the participants list
+    
       await ctx.db.patch(args.listId, {
         participants: list.participants.filter(
           (p) => p.userId !== user?.subject
@@ -341,7 +341,7 @@ export const listTodos = query({
         const list = await ctx.db.get(todo.listId);
   
         // Check if the user is an editor in the list
-        const isEditor = list?.participants.some(p => p.userId === user.tokenIdentifier && p.role === "editor");
+        const isEditor = list?.participants.some(p => p.userId === user?.subject && p.role === "editor");
         if (!isEditor) {
           throw new Error("Unauthorized to delete this todo");
         }

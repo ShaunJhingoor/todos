@@ -1,48 +1,141 @@
-// import { useMutation, useQuery } from "convex/react";
-// import { api } from "../../../convex/_generated/api";
-// import { Id } from "../../../convex/_generated/dataModel";
-
-// export function ListToDo(){
-//     const todos = useQuery(api.functions.listTodos)
-//     return (
-//         <ul className="space-y-2">
-//         {todos?.map(({_id, title, description, completed}, index) => (
-//             <ToDoItem
-//                 key={index} 
-//                 id={_id}
-//                 title={title}
-//                 description={description}
-//                 completed={completed}
-//             />
-//         ))}
-//       </ul>
-//     )
-// }
+import React, { useEffect, useState } from 'react';
+import { Checkbox, Typography , Card, Box, CardContent, Tooltip, IconButton, } from '@mui/material';
+import { api } from '../../../convex/_generated/api';
+import { useQuery } from 'convex/react';
+import { Id } from '../../../convex/_generated/dataModel';
+import { useMutation } from 'convex/react';
+import { Delete as DeleteIcon, Edit as EditIcon, Check as CheckIcon} from "@mui/icons-material";
 
 
-// function ToDoItem({id, title, description, completed}: {
-//     id: Id<"todos">
-//     title:string
-//     description: string, 
-//     completed: boolean,
-//   }){
-//     const updateTodo = useMutation(api.functions.updateTodo)
-//     const deleteTodo = useMutation(api.functions.deleteTodo)
-//     return (
-//       <li className="w-full flex items-center gap-2 border rounded p-2">
-//       <input 
-//       type="checkbox" 
-//       checked={completed} 
-//       onChange={e => updateTodo({id, completed: e.target.checked})}
-//       />
-//       <div>
-//       <p className="font-semibold">{title}</p> 
-//       <p className="text-sm text-gray-600">{description}</p>
-//       </div>
-//       <div className="ml-auto">
-//         <button type="button" className="text-red-500 cursor-pointer" onClick={() => deleteTodo({id})}>Remove</button>
-//       </div>
-//     </li>
-//     )
-//   }
+interface TodoListProps {
+  listId: Id<'lists'>;
+}
+
+interface TodoItemProps {
+    todo: {
+      _id: Id<'todos'>;
+      title: string;
+      description: string;
+      completed: boolean;
+      dueDate: string;
+      expectedTime:string;
+    };
+    listId: Id<'lists'>;
+  }
+
+export function TodoList({ listId }: TodoListProps) {
+ 
+  const todos = useQuery(api.functions.listTodos, { listId });
+
+
+  return (
+    <ul className="space-y-4">
+    {todos?.map((todo) => (
+        <TodoItem todo={todo} listId={listId} />
+    ))}
+    </ul>
+  );
+}
+
+
+ function TodoItem({ todo, listId }: TodoItemProps) {
+    const markCompleted = useMutation(api.functions.updateTodoCompletionStatus);
+    const deleteTodo = useMutation(api.functions.deleteTodo);
   
+    const handleComplete = async () => {
+      try {
+        await markCompleted({ id: todo._id, completed: !todo.completed });
+      } catch (error) {
+        console.error('Error marking todo as completed:', error);
+      }
+    };
+  
+    const handleDelete = async () => {
+      try {
+        await deleteTodo({ id: todo._id });
+      } catch (error) {
+        console.error('Error deleting todo:', error);
+      }
+    };
+  
+    return (
+        <Card
+          className="shadow-lg rounded-xl overflow-hidden"
+          sx={{
+            background: 'linear-gradient(135deg, #f3f4f6, #e2e8f0)',
+            border: '1px solid #e0e0e0',
+            marginTop: '2rem',
+            transition: 'transform 0.2s',
+            '&:hover': {
+              transform: 'scale(1.02)',
+              boxShadow: '0 10px 20px rgba(0, 0, 0, 0.12)',
+            },
+          }}
+        >
+          <CardContent className="flex justify-between items-center p-4">
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 'bold',
+                  color: '#1f2937',
+                  fontFamily: 'Roboto, sans-serif',
+                  letterSpacing: '0.5px',
+                  textTransform: 'capitalize',
+                  mb: 0.5,
+                }}
+              >
+                {todo.title}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: '#4b5563', fontSize: '0.875rem', maxWidth: '15rem',
+                wordWrap: 'break-word'}}
+              >
+                {todo.description}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: '#6b7280', fontSize: '0.75rem' }}
+              >
+                Due Date: {todo.dueDate}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: '#6b7280', fontSize: '0.75rem' }}
+              >
+                Expected Time: {todo.expectedTime} Hours
+              </Typography>
+            </Box>
+            <div className="flex items-center gap-2">
+              <Tooltip title="Mark as Completed">
+                <Checkbox
+                  checked={todo.completed}
+                  onChange={handleComplete}
+                  aria-label="Mark as Completed"
+                  color={todo.completed ? "success" : "default"}
+                />
+              </Tooltip>
+              <Tooltip title="Edit Todo">
+                <IconButton
+                  color="secondary"
+                  aria-label="Edit Todo"
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Delete Todo">
+                <IconButton
+                  color="error"
+                  onClick={handleDelete}
+                  aria-label="Delete Todo"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }

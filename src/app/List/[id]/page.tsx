@@ -11,6 +11,7 @@ import { CreateTodoForm } from "@/app/components/new-todo-form";
 import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
+import { TodoList } from "@/app/components/to-do-list";
 
 const ToDoHome = () => {
   const { id } = useParams();
@@ -54,6 +55,9 @@ const ToDoHome = () => {
             {list.name}
           </h1>
         </div>
+        <div style={{ maxWidth: '60rem',  margin: '0 auto' }}>
+        <TodoList listId={list?._id}/>
+        </div>
         <Fab
           color="primary"
           aria-label="add"
@@ -64,8 +68,10 @@ const ToDoHome = () => {
           }}
           onClick={handleClickOpen}
         >
+        
             <AddIcon />
-          </Fab><Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+          </Fab>
+          <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
             <DialogTitle
               sx={{
                 display: "flex",
