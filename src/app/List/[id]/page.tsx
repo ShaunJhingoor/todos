@@ -14,15 +14,21 @@ import CloseIcon from '@mui/icons-material/Close';
 import SmartToyIcon from '@mui/icons-material/SmartToy'; 
 import { TodoList } from "@/app/components/to-do-list";
 import { GenerateToDoModal } from "@/app/components/Modals/GenerateToDoModal";
+import { useEffect } from "react";
 
 const ToDoHome = () => {
   const { id } = useParams();
   const router = useRouter();
   const listId = Array.isArray(id) ? id[0] : id;
-  const list = useQuery(api.functions.getListById, { id: listId as Id<"lists"> });
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openGenerateModal, setOpenGenerateModal] = useState(false); 
-  const {user} = useUser()
+  const {user, isLoaded} = useUser()
+  const list = useQuery(
+    api.functions.getListById,
+    isLoaded && user ? { id: listId as Id<"lists"> } : "skip"
+  );
+
+
 
   const handleClickOpenCreate = () => {
     setOpenCreateModal(true);

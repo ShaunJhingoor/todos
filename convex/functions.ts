@@ -30,11 +30,22 @@ export const listUserLists = query({
       id: v.id("lists"),
     },
     handler: async (ctx, args) => {
-  
+
       const list = await ctx.db.get(args.id);
- 
+  
+      if (!list) {
+        throw new Error('List not found');
+      }
+  
+   
+      const user = await requireUser(ctx); 
+      const isParticipant = list.participants.some(participant => participant.userId === user?.subject);
+  
+      if (!isParticipant) {
+        throw new Error('Unauthorized: User not part of the list');
+      }
+  
       return list;
-     
     },
   });
 
