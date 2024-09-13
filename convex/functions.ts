@@ -13,7 +13,7 @@ export const listUserLists = query({
     handler: async (ctx) => {
       const user = await requireUser(ctx);
 
-      console.log(user)
+
       const allLists = await ctx.db.query("lists").collect();
       
       // Filter lists to find those where the user is a participant
@@ -99,9 +99,9 @@ export const createList = mutation({
         const response = await clerkClient.users.getUserList({
           emailAddress: [email],
         });
-        console.log("response:", response)
+
         const users = response.data;
-        console.log("users:", users)
+  
         if (Array.isArray(users) && users.length > 0) {
           return users[0].id;
         } else {

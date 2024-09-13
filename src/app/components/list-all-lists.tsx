@@ -32,11 +32,13 @@ export function ListAllLists() {
  
 
   return (
+    <div className="pb-[3dvh]">
     <ul className="space-y-4">
       {lists?.map((list) => (
         <ListItem key={list._id} list={list} deleteList={deleteList} />
       ))}
     </ul>
+    </div>
   );
 }
 

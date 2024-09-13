@@ -19,6 +19,7 @@
     "@mui/material": "^6.0.2",
     "convex": "^1.15.0",
     "next": "14.2.9",
+    "openai": "^4.60.1",
     "react": "^18",
     "react-dom": "^18"
   },

@@ -1,7 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 import { Container, Typography, Box, IconButton, Fab, Dialog, DialogTitle, DialogContent } from '@mui/material';
-import { UserButton} from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
@@ -11,22 +11,35 @@ import { CreateTodoForm } from "@/app/components/new-todo-form";
 import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
+import SmartToyIcon from '@mui/icons-material/SmartToy'; 
 import { TodoList } from "@/app/components/to-do-list";
+import { GenerateToDoModal } from "@/app/components/Modals/GenerateToDoModal";
 
 const ToDoHome = () => {
   const { id } = useParams();
   const router = useRouter();
   const listId = Array.isArray(id) ? id[0] : id;
   const list = useQuery(api.functions.getListById, { id: listId as Id<"lists"> });
-  const [open, setOpen] = useState(false);
+  const [openCreateModal, setOpenCreateModal] = useState(false);
+  const [openGenerateModal, setOpenGenerateModal] = useState(false); 
+  const {user} = useUser()
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleClickOpenCreate = () => {
+    setOpenCreateModal(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleClickOpenGenerate = () => {
+    setOpenGenerateModal(true);
   };
+
+  const handleCloseCreate = () => {
+    setOpenCreateModal(false);
+  };
+
+  const handleCloseGenerate = () => {
+    setOpenGenerateModal(false);
+  };
+  const isEditor = list?.participants.some(participant => participant.userId === user?.id && participant.role === "editor");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-200 text-gray-900">
@@ -50,28 +63,29 @@ const ToDoHome = () => {
       </header>
     
       {list && (
-        <><div className="mt-[5vh]">
-          <h1 className="text-5xl font-bold text-center text-white uppercase" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
-            {list.name}
-          </h1>
-        </div>
-        <div style={{ maxWidth: '60rem', margin: '0 auto' }}>
-        <TodoList listId={list?._id}/>
-        </div>
-        <Fab
-          color="primary"
-          aria-label="add"
-          sx={{
-            position: 'fixed',
-            bottom: 16,
-            right: 16,
-          }}
-          onClick={handleClickOpen}
-        >
-        
-            <AddIcon />
-          </Fab>
-          <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+        <>
+          <div className="mt-[5vh]">
+            <h1 className="text-5xl font-bold text-center text-white uppercase" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
+              {list.name}
+            </h1>
+          </div>
+          <div style={{ maxWidth: '60rem', margin: '0 auto' }}>
+            <TodoList listId={list?._id}/>
+          </div>
+          {isEditor && (
+            <>
+          <Box sx={{ position: 'fixed', bottom: 16, right: 16, display: 'flex', gap: 2 }}>
+            <Fab color="primary" aria-label="add" onClick={handleClickOpenCreate}>
+              <AddIcon />
+            </Fab>
+            <Fab color="secondary" aria-label="generate" onClick={handleClickOpenGenerate}>
+              <SmartToyIcon />
+            </Fab>
+          </Box>
+
+          
+    
+          <Dialog open={openCreateModal} onClose={handleCloseCreate} maxWidth="sm" fullWidth>
             <DialogTitle
               sx={{
                 display: "flex",
@@ -92,7 +106,7 @@ const ToDoHome = () => {
               <IconButton
                 edge="end"
                 color="inherit"
-                onClick={handleClose}
+                onClick={handleCloseCreate}
                 aria-label="close"
                 sx={{
                   position: "absolute",
@@ -111,10 +125,59 @@ const ToDoHome = () => {
                 boxShadow: "inset 0 1px 2px rgba(0, 0, 0, 0.1)",
               }}
             >
-              <CreateTodoForm listId={listId as Id<"lists">} onSuccess={handleClose} />
+              <CreateTodoForm listId={listId as Id<"lists">} onSuccess={handleCloseCreate} />
             </DialogContent>
-          </Dialog></>
+          </Dialog>
+
+    
+          <Dialog open={openGenerateModal} onClose={handleCloseGenerate} maxWidth="sm" fullWidth>
+            <DialogTitle
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                position: "relative",
+                fontSize: "1.2rem",
+                fontWeight: "medium",
+                color: "primary.main",
+                padding: "16px 24px",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                background: "linear-gradient(135deg, #f3f4f6, #e2e8f0)",
+                borderBottom: "1px solid #e0e0e0",
+              }}
+            >
+              Generate To-Dos
+              <IconButton
+                edge="end"
+                color="inherit"
+                onClick={handleCloseGenerate}
+                aria-label="close"
+                sx={{
+                  position: "absolute",
+                  right: 8,
+                  top: 8,
+                  color: (theme) => theme.palette.grey[500],
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
+            <DialogContent
+              sx={{
+                padding: "24px",
+                background: "linear-gradient(135deg, #f3f4f6, #e2e8f0)",
+                boxShadow: "inset 0 1px 2px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              <GenerateToDoModal listId={listId as Id<"lists">} onSuccess={handleCloseGenerate} />
+            </DialogContent>
+          </Dialog>
+          </>
+         )}
+        </>
       )}
+
       <AuthLoading>
         <Box className="flex items-center justify-center h-screen">
           <div className="relative">
