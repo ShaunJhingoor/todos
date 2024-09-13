@@ -29,12 +29,18 @@ export function TodoList({ listId }: TodoListProps) {
   const todos = useQuery(api.functions.listTodos, { listId });
 
 
+  const sortedTodos = todos?.sort((a, b) => {
+    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+  });
+
   return (
+    <div className='pb-[3vh]'>
     <ul className="space-y-4">
-    {todos?.map((todo) => (
+    {sortedTodos?.map((todo) => (
         <TodoItem todo={todo} listId={listId} key={todo?._id}/>
     ))}
     </ul>
+    </div>
   );
 }
 
@@ -64,6 +70,12 @@ export function TodoList({ listId }: TodoListProps) {
       }
     };
   
+    const formatDate = (date: string): string => {
+        const [year, month, day] = date.split("-");
+        return `Due Date: ${month}/${day}/${year}`;
+      };
+
+      const isOverdue = new Date(todo.dueDate) < new Date();
     return (
         <>
           <Card
@@ -107,9 +119,9 @@ export function TodoList({ listId }: TodoListProps) {
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: '#6b7280', fontSize: '0.75rem' }}
+                  sx={{ color: isOverdue ? 'red' : '#6b7280', fontSize: '0.75rem' }}
                 >
-                  Due Date: {todo.dueDate}
+                  {formatDate(todo.dueDate)}
                 </Typography>
                 <Typography
                   variant="body2"

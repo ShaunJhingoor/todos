@@ -13,7 +13,7 @@ export const listUserLists = query({
     handler: async (ctx) => {
       const user = await requireUser(ctx);
 
-      console.log(user)
+
       const allLists = await ctx.db.query("lists").collect();
       
       // Filter lists to find those where the user is a participant
@@ -30,11 +30,22 @@ export const listUserLists = query({
       id: v.id("lists"),
     },
     handler: async (ctx, args) => {
-  
+
       const list = await ctx.db.get(args.id);
- 
+  
+      if (!list) {
+        throw new Error('List not found');
+      }
+  
+   
+      const user = await requireUser(ctx); 
+      const isParticipant = list.participants.some(participant => participant.userId === user?.subject);
+  
+      if (!isParticipant) {
+        throw new Error('Unauthorized: User not part of the list');
+      }
+  
       return list;
-     
     },
   });
 
@@ -99,9 +110,9 @@ export const createList = mutation({
         const response = await clerkClient.users.getUserList({
           emailAddress: [email],
         });
-        console.log("response:", response)
+
         const users = response.data;
-        console.log("users:", users)
+  
         if (Array.isArray(users) && users.length > 0) {
           return users[0].id;
         } else {

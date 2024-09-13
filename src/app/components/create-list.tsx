@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api"; // Adjust the path as needed
+import { api } from "../../../convex/_generated/api"; 
 
 interface CreateListFormProps {
   onSuccess: () => void; 
