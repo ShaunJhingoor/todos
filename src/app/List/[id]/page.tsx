@@ -12,9 +12,10 @@ import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import SmartToyIcon from '@mui/icons-material/SmartToy'; 
+import { ListAlt } from "@mui/icons-material";
 import { TodoList } from "@/app/components/to-do-list";
 import { GenerateToDoModal } from "@/app/components/Modals/GenerateToDoModal";
-import { useEffect } from "react";
+
 
 const ToDoHome = () => {
   const { id } = useParams();
@@ -52,6 +53,8 @@ const ToDoHome = () => {
       {/* Header */}
       <header className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md py-4">
         <Container maxWidth="lg" className="flex items-center justify-between">
+        <Box className="flex items-center">
+          <ListAlt sx={{ fontSize: 32, marginRight: 1 }} /> 
           <Typography
             variant="h4"
             className="font-semibold cursor-pointer"
@@ -64,10 +67,10 @@ const ToDoHome = () => {
           >
             To-Do List
           </Typography>
+          </Box>
           <UserButton />
         </Container>
       </header>
-    
       {list && (
         <>
           <div className="mt-[5vh]">

@@ -5,7 +5,7 @@ import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
 import { SignInButton, UserButton, SignUpButton } from "@clerk/nextjs";
 import { useState } from "react";
 import { Container, Box, Typography, Button, Dialog, DialogTitle, DialogContent, IconButton, Fab } from '@mui/material';
-import { TaskAlt, Alarm, People } from '@mui/icons-material';
+import { TaskAlt, SmartToy, People, ListAlt } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -24,10 +24,13 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-200 text-gray-900">
       {/* Header */}
       <header className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md py-4">
-        <Container maxWidth="lg" className="flex items-center justify-between">
+      <Container maxWidth="lg" className="flex items-center justify-between">
+        <Box className="flex items-center">
+          <ListAlt sx={{ fontSize: 32, marginRight: 1 }} />  {/* Added List Icon */}
           <Typography variant="h4" className="font-semibold">To-Do List</Typography>
-          <UserButton />
-        </Container>
+        </Box>
+        <UserButton />
+      </Container>
       </header>
 
       {/* Authenticated Content */}
@@ -156,10 +159,10 @@ export default function Home() {
                 </Typography>
               </Box>
               <Box className="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-transform">
-                <Alarm sx={{ fontSize: 60, color: '#f57c00' }} />
-                <Typography variant="h6" className="font-semibold mb-3 text-blue-800">Reminders</Typography>
+                <SmartToy sx={{ fontSize: 60, color: '#f57c00' }} />
+                <Typography variant="h6" className="font-semibold mb-3 text-blue-800">AI To-Dos</Typography>
                 <Typography variant="body2" className="text-gray-600">
-                  Set reminders to stay on top of your deadlines.
+                Generate to-dos for a tasks based on any topic using AI. Let AI help you stay organized and focused on your goals.
                 </Typography>
               </Box>
               <Box className="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-transform">
@@ -183,7 +186,7 @@ export default function Home() {
               Have questions or need support? Reach out to us—we’re here to help you make the most of our app.
             </Typography>
             <a
-              href="mailto:support@example.com"
+              href="mailto:jhingoor1945@gmail.com"
               className="text-blue-700 hover:underline text-lg"
             >
               support@example.com
