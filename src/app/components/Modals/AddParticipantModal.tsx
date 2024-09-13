@@ -83,7 +83,7 @@ export function AddParticipantModal({ isOpen, onClose, listId }: AddParticipantM
             onChange={(e) => setEmail(e.target.value)}
             variant="outlined"
             size="small"
-            className="mb-4"
+            style={{ color: '#1f2937', backgroundColor: '#f9fafb', marginBottom: '1rem' }}
             InputProps={{
               style: { color: '#1f2937', backgroundColor: '#f9fafb' },
             }}

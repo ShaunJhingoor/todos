@@ -11,5 +11,3 @@ export const requireUser = async (ctx:QueryCtx) => {
         }
     return user
 }
-
-// user_2lr60JWg83tEJ70Cc2ycwWQEbeh
