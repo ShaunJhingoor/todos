@@ -93,7 +93,7 @@ export function EditTodoModal({ isOpen, onClose, todo }: EditTodoModalProps) {
             onChange={(e) => setTitle(e.target.value)}
             variant="outlined"
             size="small"
-            className="mb-4"
+            style={{ color: '#1f2937', backgroundColor: '#f9fafb', marginBottom: '1.5rem' }}
             InputProps={{
               style: { color: '#1f2937', backgroundColor: '#f9fafb' },
             }}
@@ -108,7 +108,7 @@ export function EditTodoModal({ isOpen, onClose, todo }: EditTodoModalProps) {
             onChange={(e) => setDescription(e.target.value)}
             variant="outlined"
             size="small"
-            className="mb-4"
+            style={{ color: '#1f2937', backgroundColor: '#f9fafb', marginBottom: '1.5rem' }}
             InputProps={{
               style: { color: '#1f2937', backgroundColor: '#f9fafb' },
             }}
@@ -124,7 +124,7 @@ export function EditTodoModal({ isOpen, onClose, todo }: EditTodoModalProps) {
             onChange={(e) => setDueDate(e.target.value)}
             variant="outlined"
             size="small"
-            className="mb-4"
+            style={{ color: '#1f2937', backgroundColor: '#f9fafb', marginBottom: '1.5rem' }}
             InputProps={{
               style: { color: '#1f2937', backgroundColor: '#f9fafb' },
             }}
@@ -140,7 +140,7 @@ export function EditTodoModal({ isOpen, onClose, todo }: EditTodoModalProps) {
             onChange={(e) => setExpectedTime(e.target.value)}
             variant="outlined"
             size="small"
-            className="mb-4"
+            style={{ color: '#1f2937', backgroundColor: '#f9fafb' }}
             InputProps={{
               style: { color: '#1f2937', backgroundColor: '#f9fafb' },
             }}
@@ -152,7 +152,7 @@ export function EditTodoModal({ isOpen, onClose, todo }: EditTodoModalProps) {
             variant="contained"
             color="primary"
             onClick={handleSaveChanges}
-            className="w-full mt-4"
+            className="w-full"
             style={{
               backgroundColor: '#4f46e5',
               color: '#ffffff',
@@ -160,6 +160,7 @@ export function EditTodoModal({ isOpen, onClose, todo }: EditTodoModalProps) {
               borderRadius: '0.5rem',
               textTransform: 'none',
               boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)',
+              marginTop:"1.5rem"
             }}
           >
             Save Changes
