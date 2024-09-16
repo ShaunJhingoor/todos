@@ -361,3 +361,49 @@ export const listTodos = query({
       await ctx.db.delete(args.id);
     },
   });
+
+  export const listMessages = query({
+    args: {
+      listId: v.id("lists"),
+    },
+    handler: async (ctx, args) => {
+      const user = await requireUser(ctx);
+      const list = await ctx.db.get(args.listId);
+  
+      // Ensure the user is an editor
+      const isEditor = list?.participants.some(p => p.userId === user?.subject && p.role === "editor");
+      if (!isEditor) {
+        throw new Error("Unauthorized to view messages for this list");
+      }
+  
+      // Fetch all messages for this list
+      return await ctx.db.query("messages")
+        .withIndex("by_list_id", q => q.eq("listId", args.listId))
+        .collect();
+    },
+  });
+
+  export const sendMessage = mutation({
+  args: {
+    listId: v.id("lists"),
+    message: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireUser(ctx);
+    const list = await ctx.db.get(args.listId);
+
+    // Ensure the user is an editor
+    const isEditor = list?.participants.some(p => p.userId === user?.subject && p.role === "editor");
+    if (!isEditor) {
+      throw new Error("Unauthorized to send messages to this list");
+    }
+
+    // Insert the new message into the messages table
+    await ctx.db.insert("messages", {
+      listId: args.listId,
+      senderId: user?.subject,
+      message: args.message,
+      timestamp: Date.now(), // Use current timestamp
+    });
+  },
+});
