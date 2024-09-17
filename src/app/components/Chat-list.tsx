@@ -183,7 +183,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
         } 
       }}>
         <DialogTitle sx={{ backgroundColor: '#1976d2', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2 }}>
-          <Typography variant="h6">Messages</Typography>
+          <Typography sx={{fontSize: '1.5rem'}}>Messages</Typography>
           <IconButton edge="end" color="inherit" onClick={handleCloseChat}>
             <CloseIcon />
           </IconButton>
