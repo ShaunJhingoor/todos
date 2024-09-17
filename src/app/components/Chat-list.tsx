@@ -16,27 +16,32 @@ interface ChatWidgetProps {
 
 const keyframes = `
 @keyframes slideInUp {
-  from {
+  0% {
     transform: translateY(100%);
     opacity: 0;
+    visibility: hidden;
   }
-  to {
+  100% {
     transform: translateY(0);
     opacity: 1;
+    visibility: visible;
   }
 }
 
 @keyframes slideOutDown {
-  from {
+  0% {
     transform: translateY(0);
     opacity: 1;
+    visibility: visible;
   }
-  to {
+  100% {
     transform: translateY(100%);
     opacity: 0;
+    visibility: hidden;
   }
 }
 `;
+
 
 export const ChatWidget = ({ list }: ChatWidgetProps) => {
   const [open, setOpen] = useState(false);
@@ -118,7 +123,18 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   };
 
   const formatTimestamp = (timestamp: number) => {
-    return new Date(timestamp).toLocaleString();
+    const date = new Date(timestamp);
+    
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      weekday: 'short', 
+      year: '2-digit',  
+      month: 'short',  
+      day: '2-digit',   
+      hour: '2-digit',  
+      minute: '2-digit',
+    });
+  
+    return formatter.format(date);
   };
 
   return (
@@ -133,15 +149,18 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
 
       <Dialog open={open} onClose={handleCloseChat} PaperProps={{ 
         sx: { 
-           position: 'fixed', 
-          bottom: 0, 
-          right: 0, 
-          m: 0, 
-          width: '100%', 
-          maxWidth: '400px', 
-          borderRadius: '16px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-          animation: open ? 'slideInUp 1s forwards' : 'slideOutDown 1s forwards',
+            position: 'fixed',
+            bottom: 0,
+            right: 0,
+            m: 0,
+            width: '100%',
+            maxWidth: '400px',
+            borderRadius: '16px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+            animation: open
+              ? 'slideInUp 0.5s ease-out forwards'
+              : 'slideOutDown 0.8s ease-in forwards',
+            transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
         } 
       }}>
         <DialogTitle sx={{ backgroundColor: '#1976d2', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2 }}>
@@ -162,8 +181,8 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
 
                 return (
                   <Box key={idx} sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: isCurrentUser ? 'flex-end' : 'flex-start' }}>
-                    <Typography variant="caption" sx={{ color: 'gray', mb: 0.5, fontWeight: 'semi-bold' }}>
-                      {senderEmail}
+                    <Typography variant="caption" sx={{ color: isCurrentUser? 'black' : 'gray', mb: 0.5, fontWeight: 'semi-bold', fontSize: '0.8rem' , mr: isCurrentUser ? '.5rem' : '0', ml: !isCurrentUser ? '.5rem' : '0'}}>
+                      {senderEmail.split('@')[0]}
                     </Typography>
                     <Paper
                       elevation={3}
