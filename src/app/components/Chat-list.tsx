@@ -14,6 +14,30 @@ interface ChatWidgetProps {
   };
 }
 
+const keyframes = `
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+`;
+
 export const ChatWidget = ({ list }: ChatWidgetProps) => {
   const [open, setOpen] = useState(false);
   const [newMessage, setNewMessage] = useState('');
@@ -24,7 +48,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   const sendMessage = useMutation(api.functions.sendMessage);
 
   const lastMessageIdRef = useRef<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null); // Ref for scrolling to the bottom
+  const messagesEndRef = useRef<HTMLDivElement | null>(null); 
 
   const handleToggleChat = () => {
     setOpen(!open);
@@ -44,7 +68,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
     if (newMessage.trim()) {
       try {
         const response = await sendMessage({ listId: list._id, message: newMessage });
-        console.log("response:", response)
+ 
         setNewMessage('');
         setHasNewMessage(false); 
         if (response) {
@@ -64,8 +88,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
 
     if (messages && messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
-      console.log("lastMessage:", lastMessage._id)
-      console.log("lastmessageidref:", lastMessageIdRef.current)
+     
       if (lastMessage?._id != lastMessageIdRef?.current) {
         setHasNewMessage(true);
         lastMessageIdRef.current = messages[messages.length - 1]._id;
@@ -79,10 +102,15 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
 
 
   useEffect(() => {
-    if (open && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (messages && open) {
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
     }
-  }, [open, messages]);
+  }, [messages, open]); 
+  
 
   const getParticipantEmail = (userId: string) => {
     const participant = list.participants.find(participant => participant.userId === userId);
@@ -100,19 +128,20 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
           <ChatIcon />
         </Badge>
       </Fab>
-      
+
+      <style>{keyframes}</style>
+
       <Dialog open={open} onClose={handleCloseChat} PaperProps={{ 
         sx: { 
-          position: 'fixed', 
+           position: 'fixed', 
           bottom: 0, 
           right: 0, 
           m: 0, 
           width: '100%', 
           maxWidth: '400px', 
-          transition: 'transform 0.3s', 
-          transform: open ? 'translateY(0)' : 'translateY(100%)',
           borderRadius: '16px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+          animation: open ? 'slideInUp 1s forwards' : 'slideOutDown 1s forwards',
         } 
       }}>
         <DialogTitle sx={{ backgroundColor: '#1976d2', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2 }}>
@@ -124,7 +153,6 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
         <DialogContent sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
           <Box 
             sx={{ flexGrow: 1, maxHeight: '300px', overflowY: 'auto', mb: 2 }}
-            ref={messagesEndRef} // Attach ref to scroll container
           >
             {messages && messages.length > 0 ? (
               messages.map((msg, idx) => {
@@ -162,8 +190,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
             ) : (
               <Typography variant="body2" color="textSecondary">No messages yet.</Typography>
             )}
-            {/* Ensure the scroll container ends here */}
-            <div ref={messagesEndRef} />
+             <div ref={messagesEndRef}></div>
           </Box>
     
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
