@@ -399,11 +399,12 @@ export const listTodos = query({
     }
 
     // Insert the new message into the messages table
-    await ctx.db.insert("messages", {
+    const newMessage = await ctx.db.insert("messages", {
       listId: args.listId,
       senderId: user?.subject,
       message: args.message,
       timestamp: Date.now(), // Use current timestamp
     });
+    return newMessage;
   },
 });

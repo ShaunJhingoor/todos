@@ -43,9 +43,13 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   const handleSendMessage = async () => {
     if (newMessage.trim()) {
       try {
-        await sendMessage({ listId: list._id, message: newMessage });
+        const response = await sendMessage({ listId: list._id, message: newMessage });
+        console.log("response:", response)
         setNewMessage('');
-        setHasNewMessage(false); // Reset new message notification
+        setHasNewMessage(false); 
+        if (response) {
+            localStorage.setItem(`lastMessageId_${list._id}`, response);
+        }
       } catch (error) {
         console.error("Failed to send message:", error);
       }
@@ -60,12 +64,19 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
 
     if (messages && messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
-      if (lastMessage._id !== lastMessageIdRef.current) {
+      console.log("lastMessage:", lastMessage._id)
+      console.log("lastmessageidref:", lastMessageIdRef.current)
+      if (lastMessage?._id != lastMessageIdRef?.current) {
         setHasNewMessage(true);
         lastMessageIdRef.current = messages[messages.length - 1]._id;
+      }else{
+        setHasNewMessage(false);
       }
     }
   }, [messages]);
+
+ 
+
 
   useEffect(() => {
     if (open && messagesEndRef.current) {
