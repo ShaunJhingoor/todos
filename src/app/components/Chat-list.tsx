@@ -61,6 +61,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
       setHasNewMessage(false);
       if (messages && messages.length > 0) {
         lastMessageIdRef.current = messages[messages.length - 1]._id;
+        localStorage.setItem(`lastMessageId_${list._id}`, messages[messages.length - 1]._id);
       }
     }
   };
@@ -86,22 +87,33 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   };
 
   useEffect(() => {
-    const savedLastMessageId = localStorage.getItem(`lastMessageId_${list._id}`);
-    if (savedLastMessageId) {
-      lastMessageIdRef.current = savedLastMessageId;
-    }
-
-    if (messages && messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-     
-      if (lastMessage?._id != lastMessageIdRef?.current) {
-        setHasNewMessage(true);
-        lastMessageIdRef.current = messages[messages.length - 1]._id;
-      }else{
-        setHasNewMessage(false);
+    const handleMessageCheck = () => {
+      const savedLastMessageId = localStorage.getItem(`lastMessageId_${list._id}`);
+      console.log(savedLastMessageId);
+      if (savedLastMessageId) {
+        lastMessageIdRef.current = savedLastMessageId;
       }
-    }
-  }, [messages]);
+  
+      if (messages && messages.length > 0) {
+        const lastMessage = messages[messages.length - 1];
+    
+        if (lastMessage?._id !== lastMessageIdRef?.current) {
+          setHasNewMessage(true);
+          lastMessageIdRef.current = lastMessage._id;
+        } else {
+          setHasNewMessage(false);
+        }
+      }
+    };
+  
+    // Delay the message check by 100 milliseconds (or any desired delay)jd7fcwhtjz3b73ykn7tqzesxv570yg19
+    const timeoutId = setTimeout(handleMessageCheck, 1000);
+  
+    // Cleanup function to clear the timeout if the component unmounts or dependencies change
+    return () => clearTimeout(timeoutId);
+  
+  }, [messages, list._id]); // Include list._id if it's used within the effect
+  
 
  
 
@@ -135,6 +147,13 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
     });
   
     return formatter.format(date);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); 
+      handleSendMessage();
+    }
   };
 
   return (
@@ -218,6 +237,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               label="Type your message"
+              onKeyDown={handleKeyDown}
               variant="outlined"
               size="small"
               sx={{ mr: 1, borderRadius: '16px' }}
