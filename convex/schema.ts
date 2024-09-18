@@ -25,5 +25,11 @@ export default defineSchema({
       })
       .index("by_owner_id", ["ownerId"]),
 
+      messages: defineTable({
+        listId: v.id("lists"), 
+        senderId: v.string(), 
+        message: v.string(), 
+        timestamp: v.number(),
+      }).index("by_list_id", ["listId"]),
 })
 

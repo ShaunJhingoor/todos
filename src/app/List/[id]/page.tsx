@@ -10,12 +10,12 @@ import { Id } from "../../../../convex/_generated/dataModel";
 import { CreateTodoForm } from "@/app/components/new-todo-form";
 import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from '@mui/icons-material/Close'; 
 import SmartToyIcon from '@mui/icons-material/SmartToy'; 
-import { ListAlt } from "@mui/icons-material";
+import { ListAlt} from "@mui/icons-material";
 import { TodoList } from "@/app/components/to-do-list";
 import { GenerateToDoModal } from "@/app/components/Modals/GenerateToDoModal";
-
+import { ChatWidget } from "@/app/components/Chat-list";
 
 const ToDoHome = () => {
   const { id } = useParams();
@@ -83,16 +83,30 @@ const ToDoHome = () => {
           </div>
           {isEditor && (
             <>
-          <Box sx={{ position: 'fixed', bottom: 16, right: 16, display: 'flex', gap: 2 }}>
-            <Fab color="primary" aria-label="add" onClick={handleClickOpenCreate}>
-              <AddIcon />
-            </Fab>
-            <Fab color="secondary" aria-label="generate" onClick={handleClickOpenGenerate}>
-              <SmartToyIcon />
-            </Fab>
-          </Box>
+          <Box 
+            sx={{ 
+              position: 'fixed', 
+              bottom: 16, 
+              right: 16, 
+              display: 'flex', 
+              flexDirection: 'row', 
+              flexWrap: 'nowrap',
+              gap: 2, 
+              alignItems: 'center'  
+            }} 
+        >
+          <Fab color="primary" aria-label="add" onClick={handleClickOpenCreate}>
+            <AddIcon />
+          </Fab>
+          <Fab color="secondary" aria-label="generate" onClick={handleClickOpenGenerate}>
+            <SmartToyIcon />
+          </Fab>
+          <ChatWidget list={list} />
+        </Box>
 
-          
+    
+
+            
     
           <Dialog open={openCreateModal} onClose={handleCloseCreate} maxWidth="sm" fullWidth>
             <DialogTitle
@@ -182,6 +196,8 @@ const ToDoHome = () => {
               <GenerateToDoModal listId={listId as Id<"lists">} onSuccess={handleCloseGenerate} />
             </DialogContent>
           </Dialog>
+        
+        
           </>
          )}
         </>
