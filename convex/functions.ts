@@ -408,3 +408,42 @@ export const listTodos = query({
     return newMessage;
   },
 });
+
+export const updateMessage = mutation({
+  args: {
+    messageId: v.id("messages"),
+    message: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireUser(ctx);
+    const message = await ctx.db.get(args.messageId);
+
+
+    if (message?.senderId !== user.subject) {
+      throw new Error("Unauthorized to edit this message.");
+    }
+
+    return await ctx.db.patch(args.messageId, {
+      message: args.message,
+    });
+  },
+});
+
+
+export const deleteMessage = mutation({
+  args: {
+    messageId: v.id("messages"),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireUser(ctx);
+    const message = await ctx.db.get(args.messageId);
+
+  
+    if (message?.senderId !== user.subject) {
+      throw new Error("Unauthorized to delete this message.");
+    }
+
+    return await ctx.db.delete(args.messageId);
+  },
+});
+

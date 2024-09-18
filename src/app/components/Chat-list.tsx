@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, Fab, Badge, Dialog, DialogTitle, DialogContent, IconButton, TextField, Button, Typography, Paper } from '@mui/material';
+import { Box, Fab, Badge, Dialog, DialogTitle, DialogContent, Divider, IconButton, TextField, Button, Typography, Paper, Menu, MenuItem } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useMutation, useQuery } from "convex/react";
 import { api } from '../../../convex/_generated/api';
 import { useUser } from '@clerk/nextjs';
 import { Id } from '../../../convex/_generated/dataModel';
-
+import { Save as SaveIcon } from '@mui/icons-material';
 interface ChatWidgetProps {
   list: {
     _id: Id<"lists">;
@@ -48,9 +48,15 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   const [newMessage, setNewMessage] = useState('');
   const [hasNewMessage, setHasNewMessage] = useState(false);
   const { user } = useUser();
+  const [selectedMessage, setSelectedMessage] = useState<{ id: string, text: string } | null>(null);
+  const [editMessageId, setEditMessageId] = useState<string | null>(null);
+  const [editedMessage, setEditedMessage] = useState<string>('');
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   
   const messages = useQuery(api.functions.listMessages, { listId: list._id });
   const sendMessage = useMutation(api.functions.sendMessage);
+  const updateMessage = useMutation(api.functions.updateMessage)
+  const deleteMessage = useMutation(api.functions.deleteMessage)
 
   const lastMessageIdRef = useRef<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null); 
@@ -106,13 +112,12 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
       }
     };
   
-    // Delay the message check by 100 milliseconds (or any desired delay)jd7fcwhtjz3b73ykn7tqzesxv570yg19
+
     const timeoutId = setTimeout(handleMessageCheck, 1000);
   
-    // Cleanup function to clear the timeout if the component unmounts or dependencies change
     return () => clearTimeout(timeoutId);
   
-  }, [messages, list._id]); // Include list._id if it's used within the effect
+  }, [messages, list._id]); 
   
 
  
@@ -153,6 +158,49 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
     if (event.key === 'Enter') {
       event.preventDefault(); 
       handleSendMessage();
+    }
+  };
+
+  const handleOpenMenu = (event: React.MouseEvent<HTMLDivElement>, messageId: string, messageText: string) => {
+    event.preventDefault();
+    setAnchorEl(event.currentTarget);
+    setSelectedMessage({ id: messageId, text: messageText });
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+    setSelectedMessage(null);
+  };
+
+  const handleEditMessage = () => {
+    if (selectedMessage) {
+      setEditMessageId(selectedMessage.id);
+      setEditedMessage(selectedMessage.text);
+    }
+    handleCloseMenu();
+  };
+
+
+  const handleDeleteMessage = async () => {
+    if (selectedMessage) {
+      try {
+        await deleteMessage({ messageId: selectedMessage.id as Id<"messages"> });
+      } catch (error) {
+        console.error("Failed to delete message:", error);
+      }
+    }
+    handleCloseMenu();
+  };
+
+  const handleSaveEdit = async () => {
+    if (editMessageId) { 
+      try {
+        await updateMessage({ messageId: editMessageId as Id<"messages">, message: editedMessage });
+        setEditMessageId(null);
+        setEditedMessage('');
+      } catch (error) {
+        console.error("Failed to update message:", error);
+      }
     }
   };
 
@@ -199,55 +247,126 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
                 const timestamp = formatTimestamp(msg.timestamp);
 
                 return (
-                  <Box key={idx} sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: isCurrentUser ? 'flex-end' : 'flex-start' }}>
-                    <Typography variant="caption" sx={{ color: isCurrentUser? 'black' : 'gray', mb: 0.5, fontWeight: 'semi-bold', fontSize: '0.8rem' , mr: isCurrentUser ? '.5rem' : '0', ml: !isCurrentUser ? '.5rem' : '0'}}>
-                      {senderEmail.split('@')[0]}
-                    </Typography>
-                    <Paper
-                      elevation={3}
-                      sx={{
-                        display: 'inline-block',
-                        px: 2,
-                        py: 1,
-                        backgroundColor: isCurrentUser ? '#1976d2' : '#f1f1f1',
-                        color: isCurrentUser ? 'white' : 'black',
-                        borderRadius: '16px',
-                        maxWidth: '70%',
-                        textAlign: 'left',
-                        mb: 0.5
-                      }}
+                    <Box key={idx} sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: isCurrentUser ? 'flex-end' : 'flex-start' }} >
+                    <Paper sx={{
+                      p: 2,
+                      borderRadius: '12px',
+                      backgroundColor: isCurrentUser ? '#1976d2' : '#e3f2fd',
+                      color: isCurrentUser ? 'white' : 'black',
+                      maxWidth: '80%',
+                      wordBreak: 'break-word',
+                      position: 'relative',
+                      zIndex: 10
+                    }}
+                    onContextMenu={(e) => {
+                        if (isCurrentUser) {
+                          handleOpenMenu(e, msg._id, msg.message); 
+                        }
+                    }}
                     >
-                      <Typography variant="body1">{msg.message}</Typography>
+                      {editMessageId === msg._id ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <TextField
+                          value={editedMessage}
+                          onChange={(e) => setEditedMessage(e.target.value)}
+                          fullWidth
+                          variant="outlined"
+                          autoFocus
+                          multiline
+                          InputProps={{
+                            sx: {
+                              color: 'white', 
+                              borderRadius: '4px',
+                            },
+                          }}
+                        />
+                        <Button
+                            onClick={handleSaveEdit}
+                            variant="contained"
+                            startIcon={<SaveIcon />}
+                            sx={{
+                                backgroundColor: '#1976d2',
+                                color: 'white',
+                                p: '8px 16px', 
+                                borderRadius: '8px', 
+                                '&:hover': {
+                                backgroundColor: '#1565c0', 
+                                },
+                                '& .MuiButton-startIcon': {
+                                color: 'white', 
+                                fontSize: '20px', 
+                                },
+                                textTransform: 'none', 
+                                boxShadow: 'none', 
+                            }}
+                            >
+                      
+                        </Button>
+                        </Box>
+                      ) : (
+                        <>
+                          <Typography variant="body2">{msg.message}</Typography>
+                          <Typography variant="caption" sx={{ mt: 1, display: 'block', textAlign: 'right', color: isCurrentUser ? 'lightgrey' : 'grey' }}>
+                            {senderEmail.split("@")[0]} - {timestamp}
+                          </Typography>
+                        </>
+                      )}
                     </Paper>
-                    <Typography variant="caption" sx={{ color: 'gray', fontSize: '0.75rem' }}>
-                      {timestamp}
-                    </Typography>
                   </Box>
                 );
               })
             ) : (
-              <Typography variant="body2" color="textSecondary">No messages yet.</Typography>
+              <Typography>No messages yet</Typography>
             )}
-             <div ref={messagesEndRef}></div>
+            <div ref={messagesEndRef} />
           </Box>
-    
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <TextField
-              fullWidth
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              label="Type your message"
-              onKeyDown={handleKeyDown}
-              variant="outlined"
-              size="small"
-              sx={{ mr: 1, borderRadius: '16px' }}
-            />
-            <Button onClick={handleSendMessage} variant="contained" color="primary" sx={{ borderRadius: '16px' }}>
-              Send
-            </Button>
-          </Box>
+
+          <TextField
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            variant="outlined"
+            placeholder="Type a message..."
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+
+          <Button onClick={handleSendMessage} variant="contained">Send</Button>
         </DialogContent>
       </Dialog>
+   
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleCloseMenu}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        sx={{
+            '& .MuiPaper-root': {
+            borderRadius: '12px', 
+            boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+            minWidth: '150px', 
+            },
+            '& .MuiMenuItem-root': {
+            fontSize: '0.875rem', 
+            borderRadius: '8px', 
+            '&:hover': {
+                backgroundColor: '#f0f0f0', 
+            },
+            },
+            '& .MuiDivider-root': {
+            backgroundColor: '#e0e0e0', 
+            },
+        }}
+        >
+        <MenuItem onClick={handleEditMessage}>
+            Edit
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleDeleteMessage}>
+            Delete
+        </MenuItem>
+        </Menu>
     </Box>
   );
 };
