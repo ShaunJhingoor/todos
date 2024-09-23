@@ -4,16 +4,19 @@ import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 import { useUser } from "@clerk/nextjs";
 import { AddParticipantModal } from "./Modals/AddParticipantModal";
-import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon, } from "@mui/icons-material";
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+} from "@mui/icons-material";
 import { EditListModal } from "./Modals/EditListModal";
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import { Card, CardContent, Typography, Box } from '@mui/material';
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import { Card, CardContent, Typography, Box } from "@mui/material";
 import { ExitToApp as LeaveIcon } from "@mui/icons-material";
 import ParticipantsPopover from "./ParticipantPopUp";
-import { Visibility as VisibilityIcon } from '@mui/icons-material';
-import { useRouter } from 'next/navigation';
-
+import { Visibility as VisibilityIcon } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
 
 interface List {
   _id: Id<"lists">;
@@ -29,15 +32,14 @@ interface List {
 export function ListAllLists() {
   const lists = useQuery(api.functions.listUserLists);
   const deleteList = useMutation(api.functions.deleteList);
- 
 
   return (
     <div className="pb-[3dvh]">
-    <ul className="space-y-4">
-      {lists?.map((list) => (
-        <ListItem key={list._id} list={list} deleteList={deleteList} />
-      ))}
-    </ul>
+      <ul className="space-y-4">
+        {lists?.map((list) => (
+          <ListItem key={list._id} list={list} deleteList={deleteList} />
+        ))}
+      </ul>
     </div>
   );
 }
@@ -49,7 +51,7 @@ function ListItem({
   list: List;
   deleteList: (args: { listId: Id<"lists"> }) => void;
 }) {
-  const router = useRouter()
+  const router = useRouter();
   const { user } = useUser();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
@@ -58,7 +60,7 @@ function ListItem({
 
   const leaveList = useMutation(api.functions.leaveList);
   const handleNavigateToList = () => {
-    router.push(`/List/${list._id}`); 
+    router.push(`/List/${list._id}`);
   };
 
   const handleLeaveList = async () => {
@@ -79,43 +81,46 @@ function ListItem({
     setPopoverOpen(false);
   };
 
-  const isEditor = list.participants.some(participant => participant.userId === user?.id && participant.role === "editor");
+  const isEditor = list.participants.some(
+    (participant) =>
+      participant.userId === user?.id && participant.role === "editor"
+  );
 
   return (
-    <Card 
+    <Card
       className="shadow-lg rounded-xl overflow-hidden"
       sx={{
-        background: 'linear-gradient(135deg, #f3f4f6, #e2e8f0)',
-        border: '1px solid #e0e0e0',
-        transition: 'transform 0.2s',
-        '&:hover': {
-          transform: 'scale(1.02)',
-          boxShadow: '0 10px 20px rgba(0, 0, 0, 0.12)',
+        background: "linear-gradient(135deg, #f3f4f6, #e2e8f0)",
+        border: "1px solid #e0e0e0",
+        transition: "transform 0.2s",
+        "&:hover": {
+          transform: "scale(1.02)",
+          boxShadow: "0 10px 20px rgba(0, 0, 0, 0.12)",
         },
-        cursor: 'pointer'
+        cursor: "pointer",
       }}
     >
       <CardContent className="flex justify-between items-center p-4">
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography 
-            variant="h6" 
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Typography
+            variant="h6"
             sx={{
-              fontWeight: 'bold',
-              color: '#1f2937',
-              fontFamily: 'Roboto, sans-serif',
-              letterSpacing: '0.5px',
-              textTransform: 'capitalize',
-              mb: 0.5
+              fontWeight: "bold",
+              color: "#1f2937",
+              fontFamily: "Roboto, sans-serif",
+              letterSpacing: "0.5px",
+              textTransform: "capitalize",
+              mb: 0.5,
             }}
             onClick={handleNavigateToList}
           >
             {list.name}
           </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: '#4b5563', 
-              fontSize: '0.875rem' 
+          <Typography
+            variant="body2"
+            sx={{
+              color: "#4b5563",
+              fontSize: "0.875rem",
             }}
             onClick={handleNavigateToList}
           >
@@ -123,7 +128,6 @@ function ListItem({
           </Typography>
         </Box>
         <div className="flex items-center gap-2">
-          
           {isEditor && (
             <Tooltip title="View Participants">
               <IconButton
@@ -183,7 +187,7 @@ function ListItem({
         open={popoverOpen}
         anchorEl={anchorEl}
         onClose={handlePopoverClose}
-        list={list}      
+        list={list}
       />
       {user?.id === list.ownerId && isModalOpen && (
         <AddParticipantModal

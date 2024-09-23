@@ -1,13 +1,10 @@
-import { QueryCtx} from "./_generated/server";
+import { QueryCtx } from "./_generated/server";
 
+export const requireUser = async (ctx: QueryCtx) => {
+  const user = await ctx.auth.getUserIdentity();
 
-
-
-export const requireUser = async (ctx:QueryCtx) => {
-    const user = await ctx.auth.getUserIdentity()
-
-        if(!user){
-            throw new Error("Unauthorized")
-        }
-    return user
-}
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+  return user;
+};

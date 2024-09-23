@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api"; 
+import { api } from "../../../convex/_generated/api";
 
 interface CreateListFormProps {
-  onSuccess: () => void; 
+  onSuccess: () => void;
 }
 
 export function CreateListForm({ onSuccess }: CreateListFormProps) {
@@ -23,7 +23,9 @@ export function CreateListForm({ onSuccess }: CreateListFormProps) {
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col gap-2">
-        <label htmlFor="name" className="text-sm font-semibold">List Name</label>
+        <label htmlFor="name" className="text-sm font-semibold">
+          List Name
+        </label>
         <input
           className="p-2 border rounded bg-white"
           type="text"
@@ -36,7 +38,7 @@ export function CreateListForm({ onSuccess }: CreateListFormProps) {
         />
         <button
           type="submit"
-          className={`p-2 rounded text-white cursor-pointer ${isDisabled ? 'bg-gray-400' : 'bg-blue-500'} transition-colors`}
+          className={`p-2 rounded text-white cursor-pointer ${isDisabled ? "bg-gray-400" : "bg-blue-500"} transition-colors`}
           disabled={isDisabled}
         >
           Create

@@ -40,14 +40,16 @@ interface PendingChanges {
 
 export function EditListModal({ isOpen, onClose, list }: EditListModalProps) {
   const [newName, setNewName] = useState(list.name);
-  const participants = list.participants
+  const participants = list.participants;
   const [pendingChanges, setPendingChanges] = useState<PendingChanges>({
     updatedRoles: {},
     removedUsers: [],
   });
 
   const editList = useMutation(api.functions.editList);
-  const changeParticipantRole = useMutation(api.functions.changeParticipantRole);
+  const changeParticipantRole = useMutation(
+    api.functions.changeParticipantRole
+  );
   const removeParticipant = useMutation(api.functions.removeParticipant);
 
   const handleRoleChange = (userId: string, newRole: "editor" | "viewer") => {
@@ -76,7 +78,9 @@ export function EditListModal({ isOpen, onClose, list }: EditListModalProps) {
         await editList({ listId: list._id, newName });
       }
 
-      for (const [userId, newRole] of Object.entries(pendingChanges.updatedRoles)) {
+      for (const [userId, newRole] of Object.entries(
+        pendingChanges.updatedRoles
+      )) {
         await changeParticipantRole({ listId: list._id, userId, newRole });
       }
 
@@ -107,16 +111,16 @@ export function EditListModal({ isOpen, onClose, list }: EditListModalProps) {
         <div
           className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-xl mx-auto my-16 max-w-lg relative"
           style={{
-            background: 'linear-gradient(135deg, #f3f4f6, #e2e8f0)',
-            border: '1px solid #e0e0e0',
-            color: '#1f2937',
+            background: "linear-gradient(135deg, #f3f4f6, #e2e8f0)",
+            border: "1px solid #e0e0e0",
+            color: "#1f2937",
           }}
         >
           <IconButton
             className="absolute top-2 right-2"
             onClick={onClose}
             aria-label="Close"
-            style={{ color: '#1f2937' }}
+            style={{ color: "#1f2937" }}
           >
             <CloseIcon />
           </IconButton>
@@ -130,10 +134,10 @@ export function EditListModal({ isOpen, onClose, list }: EditListModalProps) {
             size="small"
             className="mb-4"
             InputProps={{
-              style: { color: '#1f2937', backgroundColor: '#f9fafb' },
+              style: { color: "#1f2937", backgroundColor: "#f9fafb" },
             }}
             InputLabelProps={{
-              style: { color: '#6b7280' },
+              style: { color: "#6b7280" },
             }}
           />
 
@@ -159,14 +163,22 @@ export function EditListModal({ isOpen, onClose, list }: EditListModalProps) {
                     {participant.email || "No email provided"}
                   </span>
                   <Select
-                    value={pendingChanges.updatedRoles[participant.userId] || participant.role}
+                    value={
+                      pendingChanges.updatedRoles[participant.userId] ||
+                      participant.role
+                    }
                     onChange={(e) =>
-                      handleRoleChange(participant.userId, e.target.value as "editor" | "viewer")
+                      handleRoleChange(
+                        participant.userId,
+                        e.target.value as "editor" | "viewer"
+                      )
                     }
                     size="small"
                     className="mr-2"
-                    disabled={pendingChanges.removedUsers.includes(participant.userId)}
-                    style={{ color: '#1f2937', minWidth: '100px' }}
+                    disabled={pendingChanges.removedUsers.includes(
+                      participant.userId
+                    )}
+                    style={{ color: "#1f2937", minWidth: "100px" }}
                   >
                     <MenuItem value="viewer">Viewer</MenuItem>
                     <MenuItem value="editor">Editor</MenuItem>
@@ -179,9 +191,17 @@ export function EditListModal({ isOpen, onClose, list }: EditListModalProps) {
                     }
                   >
                     <IconButton
-                      onClick={() => handleRemoveParticipant(participant.userId)}
+                      onClick={() =>
+                        handleRemoveParticipant(participant.userId)
+                      }
                       aria-label="Remove Participant"
-                      style={{ color: pendingChanges.removedUsers.includes(participant.userId) ? '#6b7280' : '#ef4444' }}
+                      style={{
+                        color: pendingChanges.removedUsers.includes(
+                          participant.userId
+                        )
+                          ? "#6b7280"
+                          : "#ef4444",
+                      }}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -197,12 +217,12 @@ export function EditListModal({ isOpen, onClose, list }: EditListModalProps) {
             onClick={handleSaveChanges}
             className="w-full mt-4"
             style={{
-              backgroundColor: '#4f46e5',
-              color: '#ffffff',
-              padding: '0.75rem',
-              borderRadius: '0.5rem',
-              textTransform: 'none',
-              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)',
+              backgroundColor: "#4f46e5",
+              color: "#ffffff",
+              padding: "0.75rem",
+              borderRadius: "0.5rem",
+              textTransform: "none",
+              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.15)",
             }}
           >
             Save Changes

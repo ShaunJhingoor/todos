@@ -1,10 +1,27 @@
-import React, { useState } from 'react';
-import { Popover, List, ListItem, ListItemText, TextField, IconButton, Tooltip, Button, MenuItem, Typography, Divider } from '@mui/material';
-import { Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { useMutation } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
-import { Id } from '../../../convex/_generated/dataModel';
-import { useUser } from '@clerk/nextjs';
+import React, { useState } from "react";
+import {
+  Popover,
+  List,
+  ListItem,
+  ListItemText,
+  TextField,
+  IconButton,
+  Tooltip,
+  Button,
+  MenuItem,
+  Typography,
+  Divider,
+} from "@mui/material";
+import {
+  Edit as EditIcon,
+  Save as SaveIcon,
+  Cancel as CancelIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
+import { useMutation } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import { Id } from "../../../convex/_generated/dataModel";
+import { useUser } from "@clerk/nextjs";
 
 interface Participant {
   userId: string;
@@ -23,12 +40,20 @@ interface ParticipantsPopoverProps {
   };
 }
 
-const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({ open, anchorEl, onClose, list }) => {
-  const { user } = useUser();  // Get the current user
-  const [editingParticipant, setEditingParticipant] = useState<Participant | null>(null);
+const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({
+  open,
+  anchorEl,
+  onClose,
+  list,
+}) => {
+  const { user } = useUser(); // Get the current user
+  const [editingParticipant, setEditingParticipant] =
+    useState<Participant | null>(null);
   const [editedRole, setEditedRole] = useState<"editor" | "viewer">("viewer");
 
-  const changeParticipantRole = useMutation(api.functions.changeParticipantRole);
+  const changeParticipantRole = useMutation(
+    api.functions.changeParticipantRole
+  );
   const removeParticipant = useMutation(api.functions.removeParticipant);
 
   const handleEditClick = (participant: Participant) => {
@@ -39,7 +64,11 @@ const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({ open, anchorE
   const handleSaveClick = async () => {
     if (editingParticipant) {
       try {
-        await changeParticipantRole({ listId: list._id, userId: editingParticipant.userId, newRole: editedRole });
+        await changeParticipantRole({
+          listId: list._id,
+          userId: editingParticipant.userId,
+          newRole: editedRole,
+        });
         setEditingParticipant(null);
       } catch (error) {
         alert("Error updating participant role");
@@ -67,12 +96,12 @@ const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({ open, anchorE
       anchorEl={anchorEl}
       onClose={onClose}
       anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'left',
+        vertical: "bottom",
+        horizontal: "left",
       }}
       transformOrigin={{
-        vertical: 'top',
-        horizontal: 'left',
+        vertical: "top",
+        horizontal: "left",
       }}
       sx={{ padding: 2 }}
     >
@@ -82,22 +111,39 @@ const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({ open, anchorE
       <Divider sx={{ mb: 1 }} />
       <List sx={{ width: 300 }}>
         {list.participants.map((participant) => (
-          <ListItem key={participant.userId} sx={{ display: 'flex', alignItems: 'center' }}>
+          <ListItem
+            key={participant.userId}
+            sx={{ display: "flex", alignItems: "center" }}
+          >
             {editingParticipant?.userId === participant.userId ? (
-              <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  width: "100%",
+                }}
+              >
                 <TextField
                   label="Role"
                   variant="outlined"
                   select
                   value={editedRole}
-                  onChange={(e) => setEditedRole(e.target.value as "editor" | "viewer")}
+                  onChange={(e) =>
+                    setEditedRole(e.target.value as "editor" | "viewer")
+                  }
                   margin="dense"
                   fullWidth
                 >
                   <MenuItem value="editor">Editor</MenuItem>
                   <MenuItem value="viewer">Viewer</MenuItem>
                 </TextField>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    marginTop: "8px",
+                  }}
+                >
                   <Button
                     startIcon={<SaveIcon />}
                     color="primary"
@@ -109,7 +155,7 @@ const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({ open, anchorE
                     startIcon={<CancelIcon />}
                     color="secondary"
                     onClick={handleCancelClick}
-                    style={{ marginLeft: '8px' }}
+                    style={{ marginLeft: "8px" }}
                   >
                     Cancel
                   </Button>
@@ -122,27 +168,28 @@ const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({ open, anchorE
                   secondary={participant.role}
                   sx={{ flexGrow: 1 }}
                 />
-                {user?.id === list.ownerId && participant.userId !== list.ownerId && (
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Tooltip title="Edit Participant">
-                      <IconButton
-                        onClick={() => handleEditClick(participant)}
-                        aria-label="Edit Participant"
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Remove Participant">
-                      <IconButton
-                        onClick={() => handleRemoveClick(participant.userId)}
-                        color="error"
-                        aria-label="Remove Participant"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </div>
-                )}
+                {user?.id === list.ownerId &&
+                  participant.userId !== list.ownerId && (
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <Tooltip title="Edit Participant">
+                        <IconButton
+                          onClick={() => handleEditClick(participant)}
+                          aria-label="Edit Participant"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Remove Participant">
+                        <IconButton
+                          onClick={() => handleRemoveClick(participant.userId)}
+                          color="error"
+                          aria-label="Remove Participant"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  )}
               </>
             )}
           </ListItem>

@@ -1,11 +1,10 @@
-import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { NextResponse } from "next/server";
+import OpenAI from "openai";
 
 export async function POST(req) {
   try {
     const openai = new OpenAI();
-    const { topic, numberTodos } = await req.json(); 
-
+    const { topic, numberTodos } = await req.json();
 
     const systemPrompt = `
     You are a to-do list creator. Given a topic, create exactly ${numberTodos} to-dos.
@@ -28,36 +27,36 @@ export async function POST(req) {
     }
   `;
 
-
     const stream = new ReadableStream({
       async start(controller) {
         try {
-
           const completion = await openai.chat.completions.create({
             messages: [
               { role: "system", content: systemPrompt },
-              { role: "user", content: `Topic: ${topic}` } 
+              { role: "user", content: `Topic: ${topic}` },
             ],
             model: "gpt-3.5-turbo",
-            stream: true,  
+            stream: true,
           });
 
-
           for await (const chunk of completion) {
-            const text = chunk.choices[0]?.delta?.content || '';  
-            controller.enqueue(new TextEncoder().encode(text));   
+            const text = chunk.choices[0]?.delta?.content || "";
+            controller.enqueue(new TextEncoder().encode(text));
           }
 
           controller.close();
         } catch (error) {
-          controller.error(error);  
+          controller.error(error);
         }
-      }
+      },
     });
 
     return new NextResponse(stream);
   } catch (error) {
-    console.error('Error generating todos:', error);
-    return NextResponse.json({ error: 'Failed to generate todos' }, { status: 500 });
+    console.error("Error generating todos:", error);
+    return NextResponse.json(
+      { error: "Failed to generate todos" },
+      { status: 500 }
+    );
   }
 }
