@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Checkbox,
   Typography,
@@ -7,6 +7,7 @@ import {
   CardContent,
   Tooltip,
   IconButton,
+  Divider,
 } from "@mui/material";
 import { api } from "../../../convex/_generated/api";
 import { useQuery } from "convex/react";
@@ -32,25 +33,163 @@ interface TodoItemProps {
   listId: Id<"lists">;
 }
 
+const adjustDueDate = (dueDate: string) => {
+  const today = new Date();
+  const localOffset = today.getTimezoneOffset() * 60000;
+  const originalDueDate = new Date(new Date(dueDate).getTime() - localOffset);
+  const adjustedDueDate = new Date(originalDueDate);
+  adjustedDueDate.setDate(adjustedDueDate.getDate() + 1);
+  return adjustedDueDate;
+};
+
 export function TodoList({ listId }: TodoListProps) {
   const todos = useQuery(api.functions.listTodos, { listId });
 
-  const sortedTodos = todos?.sort((a, b) => {
-    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-  });
+  const now = new Date();
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+  const endOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + 1
+  );
+  const weekFromNow = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + 7
+  );
+
+  const overdueTodos = useMemo(
+    () =>
+      todos
+        ?.filter((todo) => adjustDueDate(todo.dueDate) < startOfToday)
+        .sort(
+          (a, b) =>
+            adjustDueDate(a.dueDate).getTime() -
+            adjustDueDate(b.dueDate).getTime()
+        ),
+    [todos]
+  );
+  const dueTodayTodos = useMemo(
+    () =>
+      todos?.filter(
+        (todo) =>
+          adjustDueDate(todo.dueDate) >= startOfToday &&
+          adjustDueDate(todo.dueDate) <= endOfToday
+      ),
+    [todos]
+  );
+  const dueThisWeekTodos = useMemo(
+    () =>
+      todos
+        ?.filter(
+          (todo) =>
+            adjustDueDate(todo.dueDate) >= endOfToday &&
+            adjustDueDate(todo.dueDate) < weekFromNow
+        )
+        .sort(
+          (a, b) =>
+            adjustDueDate(a.dueDate).getTime() -
+            adjustDueDate(b.dueDate).getTime()
+        ),
+    [todos]
+  );
+  const otherTodos = useMemo(
+    () =>
+      todos
+        ?.filter((todo) => adjustDueDate(todo.dueDate) >= weekFromNow)
+        .sort(
+          (a, b) =>
+            adjustDueDate(a.dueDate).getTime() -
+            adjustDueDate(b.dueDate).getTime()
+        ),
+    [todos]
+  );
 
   return (
-    <div className="pb-[3vh]">
-      <ul className="space-y-4">
-        {sortedTodos?.map((todo) => (
-          <TodoItem todo={todo} listId={listId} key={todo?._id} />
-        ))}
-      </ul>
-    </div>
+    <Box className="pb-[3vh] space-y-4">
+      {overdueTodos && overdueTodos?.length > 0 && (
+        <Card
+          variant="outlined"
+          sx={{ backgroundColor: "transparent", border: "none" }}
+        >
+          <CardContent>
+            <Typography variant="h5" color="error" gutterBottom>
+              Overdue
+            </Typography>
+            <Divider />
+            <Box mt={2}>
+              {overdueTodos.map((todo) => (
+                <TodoItem key={todo._id} todo={todo} listId={listId} />
+              ))}
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+      {dueTodayTodos && dueTodayTodos?.length > 0 && (
+        <Card
+          variant="outlined"
+          sx={{ backgroundColor: "transparent", border: "none" }}
+        >
+          <CardContent>
+            <Typography variant="h5" color="primary" gutterBottom>
+              Due Today
+            </Typography>
+            <Divider />
+            <Box mt={2}>
+              {dueTodayTodos.map((todo) => (
+                <TodoItem key={todo._id} todo={todo} listId={listId} />
+              ))}
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+      {dueThisWeekTodos && dueThisWeekTodos?.length > 0 && (
+        <Card
+          variant="outlined"
+          sx={{ backgroundColor: "transparent", border: "none" }}
+        >
+          <CardContent>
+            <Typography variant="h5" color="success.main" gutterBottom>
+              Due This Week
+            </Typography>
+            <Divider />
+            <Box mt={2}>
+              {dueThisWeekTodos.map((todo) => (
+                <TodoItem key={todo._id} todo={todo} listId={listId} />
+              ))}
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+      {otherTodos && otherTodos?.length > 0 && (
+        <Card
+          variant="outlined"
+          sx={{ backgroundColor: "transparent", border: "none" }}
+        >
+          <CardContent>
+            <Typography variant="h5" color="textSecondary" gutterBottom>
+              Others
+            </Typography>
+            <Divider />
+            <Box mt={2}>
+              {otherTodos.map((todo) => (
+                <TodoItem key={todo._id} todo={todo} listId={listId} />
+              ))}
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+    </Box>
   );
 }
 
 function TodoItem({ todo, listId }: TodoItemProps) {
+  const adjustedDueDate = adjustDueDate(todo.dueDate);
+
   const markCompleted = useMutation(api.functions.updateTodoCompletionStatus);
   const deleteTodo = useMutation(api.functions.deleteTodo);
   const { user } = useUser();
@@ -84,8 +223,12 @@ function TodoItem({ todo, listId }: TodoItemProps) {
     const [year, month, day] = date.split("-");
     return `Due Date: ${month}/${day}/${year}`;
   };
+  const now = new Date();
 
-  const isOverdue = new Date(todo.dueDate) < new Date();
+  const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const isOverdue = adjustedDueDate < endOfToday;
+
   return (
     <>
       <Card
