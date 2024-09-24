@@ -27,11 +27,7 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
     onSuccess();
   };
 
-  const isDisabled =
-    !title.trim() ||
-    !description.trim() ||
-    !dueDate.trim() ||
-    !expectedTime.trim();
+  const isDisabled = !title.trim() || !description.trim();
 
   return (
     <Box
@@ -81,7 +77,7 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
           fullWidth
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
-          required
+          // required
           InputLabelProps={{
             shrink: true,
           }}
@@ -101,7 +97,7 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
           value={expectedTime}
           onChange={(e) => setExpectedTime(e.target.value)}
           placeholder="Enter expected time to complete"
-          required
+          // required
         />
         <Button
           type="submit"

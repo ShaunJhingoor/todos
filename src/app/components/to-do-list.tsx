@@ -100,7 +100,9 @@ export function TodoList({ listId }: TodoListProps) {
   const otherTodos = useMemo(
     () =>
       todos
-        ?.filter((todo) => adjustDueDate(todo.dueDate) >= weekFromNow)
+        ?.filter(
+          (todo) => !todo.dueDate || adjustDueDate(todo.dueDate) >= weekFromNow
+        )
         .sort(
           (a, b) =>
             adjustDueDate(a.dueDate).getTime() -
@@ -189,7 +191,8 @@ export function TodoList({ listId }: TodoListProps) {
 
 function TodoItem({ todo, listId }: TodoItemProps) {
   const adjustedDueDate = adjustDueDate(todo.dueDate);
-
+  console.log("duedate:", todo.dueDate);
+  console.log("expected:", todo.expectedTime);
   const markCompleted = useMutation(api.functions.updateTodoCompletionStatus);
   const deleteTodo = useMutation(api.functions.deleteTodo);
   const { user } = useUser();
@@ -270,18 +273,25 @@ function TodoItem({ todo, listId }: TodoItemProps) {
             >
               {todo.description}
             </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: isOverdue ? "red" : "#6b7280", fontSize: "0.75rem" }}
-            >
-              {formatDate(todo.dueDate)}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: "#6b7280", fontSize: "0.75rem" }}
-            >
-              Expected Time: {todo.expectedTime} Hours
-            </Typography>
+            {todo.dueDate && (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: isOverdue ? "red" : "#6b7280",
+                  fontSize: "0.75rem",
+                }}
+              >
+                {formatDate(todo.dueDate)}
+              </Typography>
+            )}
+            {todo.expectedTime && (
+              <Typography
+                variant="body2"
+                sx={{ color: "#6b7280", fontSize: "0.75rem" }}
+              >
+                Expected Time: {todo.expectedTime} Hours
+              </Typography>
+            )}
           </Box>
           <div className="flex items-center gap-2">
             <Tooltip title="Mark as Completed">
