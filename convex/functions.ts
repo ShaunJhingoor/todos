@@ -251,6 +251,7 @@ export const createTodo = mutation({
     listId: v.id("lists"),
     dueDate: v.string(),
     expectedTime: v.string(),
+    assigneeEmail: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const user = await requireUser(ctx);
@@ -270,6 +271,7 @@ export const createTodo = mutation({
       listId: args.listId,
       dueDate: args.dueDate,
       expectedTime: args.expectedTime,
+      assigneeEmail: "unassigned",
     });
   },
 });
@@ -328,6 +330,33 @@ export const updateTodoDetails = mutation({
       dueDate: args.dueDate,
       expectedTime: args.expectedTime,
     });
+  },
+});
+
+export const assignTodo = mutation({
+  args: {
+    id: v.id("todos"),
+    assignedTo: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await requireUser(ctx);
+    const todo = await ctx.db.get(args.id);
+
+    if (!todo) {
+      throw new Error("Todo not found");
+    }
+
+    const list = await ctx.db.get(todo.listId);
+    const isEditor = list?.participants.some(
+      (p) => p.userId === user?.subject && p.role === "editor"
+    );
+
+    if (!isEditor) {
+      throw new Error("Unauthorized to assign this todo");
+    }
+
+    // Update the assignedTo field
+    await ctx.db.patch(args.id, { assigneeEmail: args.assignedTo });
   },
 });
 
@@ -400,7 +429,7 @@ export const sendMessage = mutation({
       listId: args.listId,
       senderId: user?.subject,
       message: args.message,
-      timestamp: Date.now(), 
+      timestamp: Date.now(),
     });
     return newMessage;
   },

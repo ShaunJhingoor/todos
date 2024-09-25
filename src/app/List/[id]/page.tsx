@@ -9,6 +9,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  Button,
 } from "@mui/material";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
@@ -25,6 +26,7 @@ import { ListAlt } from "@mui/icons-material";
 import { TodoList } from "@/app/components/to-do-list";
 import { GenerateToDoModal } from "@/app/components/Modals/GenerateToDoModal";
 import { ChatWidget } from "@/app/components/Chat-list";
+import { Print } from "@mui/icons-material";
 
 const ToDoHome = () => {
   const { id } = useParams();
@@ -37,7 +39,9 @@ const ToDoHome = () => {
     api.functions.getListById,
     isLoaded && user ? { id: listId as Id<"lists"> } : "skip"
   );
-
+  if (isLoaded && !user) {
+    router.push("/");
+  }
   const handleClickOpenCreate = () => {
     setOpenCreateModal(true);
   };
@@ -57,6 +61,10 @@ const ToDoHome = () => {
     (participant) =>
       participant.userId === user?.id && participant.role === "editor"
   );
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-200 text-gray-900">
@@ -84,7 +92,17 @@ const ToDoHome = () => {
               To-Do List
             </Typography>
           </Box>
-          <UserButton />
+          <Box className="flex items-center ">
+            <IconButton
+              onClick={handlePrint}
+              color="inherit"
+              aria-label="print"
+              className="mr-[1rem]"
+            >
+              <Print />
+            </IconButton>
+            <UserButton />
+          </Box>
         </Container>
       </header>
       {list && (

@@ -8,6 +8,11 @@ import {
   Tooltip,
   IconButton,
   Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
 } from "@mui/material";
 import { api } from "../../../convex/_generated/api";
 import { useQuery } from "convex/react";
@@ -29,6 +34,7 @@ interface TodoItemProps {
     completed: boolean;
     dueDate: string;
     expectedTime: string;
+    assigneeEmail?: string;
   };
   listId: Id<"lists">;
 }
@@ -195,6 +201,7 @@ function TodoItem({ todo, listId }: TodoItemProps) {
   console.log("expected:", todo.expectedTime);
   const markCompleted = useMutation(api.functions.updateTodoCompletionStatus);
   const deleteTodo = useMutation(api.functions.deleteTodo);
+  const assignTodo = useMutation(api.functions.assignTodo);
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -232,6 +239,17 @@ function TodoItem({ todo, listId }: TodoItemProps) {
 
   const isOverdue = adjustedDueDate < endOfToday;
 
+  const handleAssignChange = async (event: SelectChangeEvent<string>) => {
+    const assignedTo = event.target.value;
+    try {
+      await assignTodo({ id: todo._id, assignedTo });
+    } catch (error) {
+      console.error("Error assigning todo:", error);
+    }
+  };
+  const editorsList = list?.participants.filter(
+    (participant) => participant.role === "editor"
+  );
   return (
     <>
       <Card
@@ -291,6 +309,77 @@ function TodoItem({ todo, listId }: TodoItemProps) {
               >
                 Expected Time: {todo.expectedTime} Hours
               </Typography>
+            )}
+            {isEditor && editorsList && editorsList.length > 1 && (
+              <FormControl
+                sx={{
+                  marginTop: "1rem",
+                  width: "10rem", // Consistent width
+                  backgroundColor: "#f3f4f6",
+                  borderRadius: "8px",
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.15)",
+                  },
+                }}
+              >
+                <InputLabel
+                  id="assign-select-label"
+                  sx={{
+                    color: "#374151",
+                    fontSize: "0.9rem",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Assign To-Do
+                </InputLabel>
+                <Select
+                  labelId="assign-select-label"
+                  value={todo.assigneeEmail || "unassigned"}
+                  onChange={handleAssignChange}
+                  sx={{
+                    borderRadius: "8px",
+                    color: "#111827",
+                    "& .MuiSelect-outlined": {
+                      padding: "10px",
+                    },
+                    "& .MuiSelect-select": {
+                      display: "flex",
+                      alignItems: "center",
+                      fontSize: ".8rem",
+                    },
+                    "&:focus": {
+                      outline: "none",
+                    },
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value="unassigned">
+                    <em>Unassigned</em>
+                  </MenuItem>
+                  {editorsList.map((participant) => (
+                    <MenuItem
+                      key={participant.userId}
+                      value={participant.email}
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "#e5e7eb",
+                        },
+                      }}
+                    >
+                      {participant.email}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             )}
           </Box>
           <div className="flex items-center gap-2">

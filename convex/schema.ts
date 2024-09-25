@@ -9,6 +9,7 @@ export default defineSchema({
     listId: v.id("lists"),
     dueDate: v.string(),
     expectedTime: v.string(),
+    assigneeEmail: v.optional(v.string()),
   }).index("by_list_id", ["listId"]),
 
   lists: defineTable({
