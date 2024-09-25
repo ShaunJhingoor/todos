@@ -124,7 +124,6 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
       const savedLastMessageId = localStorage.getItem(
         `lastMessageId_${list._id}`
       );
-      console.log(savedLastMessageId);
       if (savedLastMessageId) {
         lastMessageIdRef.current = savedLastMessageId;
       }
