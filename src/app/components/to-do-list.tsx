@@ -197,8 +197,6 @@ export function TodoList({ listId }: TodoListProps) {
 
 function TodoItem({ todo, listId }: TodoItemProps) {
   const adjustedDueDate = adjustDueDate(todo.dueDate);
-  console.log("duedate:", todo.dueDate);
-  console.log("expected:", todo.expectedTime);
   const markCompleted = useMutation(api.functions.updateTodoCompletionStatus);
   const deleteTodo = useMutation(api.functions.deleteTodo);
   const assignTodo = useMutation(api.functions.assignTodo);
@@ -250,6 +248,7 @@ function TodoItem({ todo, listId }: TodoItemProps) {
   const editorsList = list?.participants.filter(
     (participant) => participant.role === "editor"
   );
+
   return (
     <>
       <Card
@@ -336,7 +335,7 @@ function TodoItem({ todo, listId }: TodoItemProps) {
                 </InputLabel>
                 <Select
                   labelId="assign-select-label"
-                  value={todo.assigneeEmail || "unassigned"}
+                  value={todo.assigneeEmail || "Unassigned"}
                   onChange={handleAssignChange}
                   sx={{
                     borderRadius: "8px",

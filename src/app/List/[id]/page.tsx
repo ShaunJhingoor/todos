@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  Button,
 } from "@mui/material";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
