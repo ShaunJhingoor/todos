@@ -322,6 +322,15 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
       }
     }
   };
+  const getFileType = (url: string) => {
+    const extension = url.split(".").pop()?.toLowerCase();
+    if (["jpg", "jpeg", "png", "gif"].includes(extension || "")) {
+      return "image";
+    } else if (["pdf"].includes(extension || "")) {
+      return "pdf";
+    }
+    return null; // Unknown file type
+  };
 
   return (
     <Box sx={{ position: "relative" }}>
@@ -453,20 +462,60 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
                         <>
                           <Typography variant="body2">{msg.message}</Typography>
                           {msg.attachmentUrl && (
-                            <Box mt={1}>
-                              <a
-                                href={msg.attachmentUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                  color: isCurrentUser ? "white" : "#1976d2",
-                                  textDecoration: "underline",
-                                }}
-                              >
-                                View Attachment
-                              </a>
+                            <Box sx={{ mt: 1 }}>
+                              {getFileType(msg.attachmentUrl) === "image" ? (
+                                <img
+                                  src={msg.attachmentUrl}
+                                  alt="Attachment Preview"
+                                  style={{
+                                    maxWidth: "100%",
+                                    borderRadius: "8px",
+                                    cursor: "pointer", // Change cursor to pointer for better UX
+                                  }}
+                                  onClick={() =>
+                                    window.open(msg.attachmentUrl, "_blank")
+                                  }
+                                />
+                              ) : getFileType(msg.attachmentUrl) === "pdf" ? (
+                                <>
+                                  <Box
+                                    onClick={() =>
+                                      window.open(msg.attachmentUrl, "_blank")
+                                    }
+                                    style={{
+                                      width: "100%",
+                                      height: "200px",
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    <iframe
+                                      src={msg.attachmentUrl}
+                                      style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        border: "none",
+                                      }}
+                                      title="PDF Preview"
+                                    />
+                                  </Box>
+                                  <Typography
+                                    onClick={() =>
+                                      window.open(msg.attachmentUrl, "_blank")
+                                    }
+                                    style={{
+                                      cursor: "pointer",
+                                      color: "white",
+                                      textDecoration: "underline",
+                                      textAlign: "center",
+                                    }}
+                                  >
+                                    View PDF
+                                  </Typography>
+                                </>
+                              ) : null}
                             </Box>
                           )}
+
                           <Typography
                             variant="caption"
                             sx={{
