@@ -24,6 +24,7 @@ import { api } from "../../../convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
 import { Id } from "../../../convex/_generated/dataModel";
 import { Save as SaveIcon } from "@mui/icons-material";
+import { Clear as ClearIcon } from "@mui/icons-material";
 
 interface ChatWidgetProps {
   list: {
@@ -80,6 +81,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(false);
 
   const messages = useQuery(api.functions.listMessages, { listId: list._id });
   const sendMessage = useMutation(api.functions.sendMessage);
@@ -109,9 +111,17 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
     setOpen(false);
   };
 
+  const handlePDFLoad = () => {
+    setLoading(false); // PDF finished loading
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setFile(event.target.files[0]);
+      const selectedFile = event.target.files[0];
+      if (selectedFile && selectedFile.type === "application/pdf") {
+        setLoading(true); // Start loading when PDF is selected
+      }
     }
   };
 
@@ -512,7 +522,28 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
                                     View PDF
                                   </Typography>
                                 </>
-                              ) : null}
+                              ) : (
+                                <Typography
+                                  onClick={() =>
+                                    window.open(msg.attachmentUrl, "_blank")
+                                  }
+                                  sx={{
+                                    cursor: "pointer",
+                                    color: "#ADD8E6",
+                                    textDecoration: "underline",
+                                    fontWeight: "bold",
+                                    fontSize: ".85rem",
+                                    display: "inline",
+                                    wordBreak: "break-all",
+                                    transition: "color 0.3s ease",
+                                    "&:hover": {
+                                      color: "#87CEFA",
+                                    },
+                                  }}
+                                >
+                                  {msg.attachmentUrl}
+                                </Typography>
+                              )}
                             </Box>
                           )}
 
@@ -538,31 +569,132 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
             )}
             <div ref={messagesEndRef} />
           </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              mb: 2,
+              position: "relative",
+              alignItems: "center",
+            }}
+          >
+            {file && (
+              <Box
+                sx={{
+                  marginBottom: 1,
+                  position: "relative",
+                  width: "100%",
+                  maxWidth: "20rem",
+                }}
+              >
+                {file.type.startsWith("image/") ? (
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="File preview"
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      borderRadius: "4px",
+                    }}
+                  />
+                ) : file.type === "application/pdf" ? (
+                  <Box
+                    sx={{
+                      width: "100%",
+                      height: "auto",
+                      borderRadius: "4px",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {loading && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          height: "200px",
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: "rgba(255, 255, 255, 0.8)",
+                        }}
+                      >
+                        <CircularProgress />
+                      </Box>
+                    )}
+                    <embed
+                      src={URL.createObjectURL(file)}
+                      type="application/pdf"
+                      width="100%"
+                      height="200px"
+                      onLoad={handlePDFLoad}
+                    />
+                  </Box>
+                ) : (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ flexGrow: 1 }}
+                  >
+                    Attached file: {file.name}
+                  </Typography>
+                )}
+                <IconButton
+                  onClick={() => setFile(null)}
+                  color="secondary"
+                  sx={{
+                    position: "absolute",
+                    top: 4,
+                    right: 4,
+                  }}
+                  title="Remove attachment"
+                >
+                  <ClearIcon />
+                </IconButton>
+              </Box>
+            )}
 
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <TextField
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              variant="outlined"
-              placeholder="Type a message..."
-              fullWidth
-              multiline
-              maxRows={4}
-              sx={{ mr: 1 }}
-            />
-            <input
-              type="file"
-              ref={fileInputRef}
-              style={{ display: "none" }}
-              onChange={handleFileChange}
-            />
-            <IconButton
-              onClick={() => fileInputRef.current?.click()}
-              color="primary"
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                position: "relative",
+                width: "100%",
+              }}
             >
-              <AttachFileIcon />
-            </IconButton>
+              <TextField
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                variant="outlined"
+                placeholder="Type a message..."
+                fullWidth
+                multiline
+                maxRows={4}
+                sx={{
+                  mr: 1,
+                  paddingTop: file ? ".2rem" : "0",
+                }}
+              />
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+              />
+
+              <IconButton
+                onClick={() => fileInputRef.current?.click()}
+                color="primary"
+                sx={{ marginTop: 1 }}
+                title="Attach file"
+              >
+                <AttachFileIcon />
+              </IconButton>
+            </Box>
           </Box>
 
           <Button
