@@ -112,16 +112,19 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   };
 
   const handlePDFLoad = () => {
-    setLoading(false); // PDF finished loading
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setFile(event.target.files[0]);
       const selectedFile = event.target.files[0];
       if (selectedFile && selectedFile.type === "application/pdf") {
-        setLoading(true); // Start loading when PDF is selected
+        setLoading(true);
       }
+      setFile(event.target.files[0]);
+      event.target.value = "";
     }
   };
 
@@ -339,7 +342,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
     } else if (["pdf"].includes(extension || "")) {
       return "pdf";
     }
-    return null; // Unknown file type
+    return null;
   };
 
   return (
@@ -624,12 +627,13 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
                         <CircularProgress />
                       </Box>
                     )}
-                    <embed
+
+                    <iframe
                       src={URL.createObjectURL(file)}
-                      type="application/pdf"
                       width="100%"
                       height="200px"
                       onLoad={handlePDFLoad}
+                      style={{ border: "none" }}
                     />
                   </Box>
                 ) : (
