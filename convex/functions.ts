@@ -3,9 +3,53 @@ import { v } from "convex/values";
 import { requireUser } from "./helper";
 import { createClerkClient } from "@clerk/clerk-sdk-node";
 import { action } from "./_generated/server";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
+import { Buffer } from "buffer";
+
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION || "",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+  },
+});
 
 const clerkClient = createClerkClient({
   secretKey: process.env.CLERK_SECRET_KEY,
+});
+
+export const uploadFileToS3 = action({
+  args: {
+    file: v.string(),
+    fileName: v.string(),
+    contentType: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { file, fileName, contentType } = args;
+
+    const buffer = Buffer.from(file, "base64");
+    const key = `${Date.now()}-${fileName}`;
+
+    const command = new PutObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: key,
+      Body: buffer,
+      ContentType: contentType,
+    });
+
+    try {
+      await s3Client.send(command);
+      const s3Url = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+      return s3Url;
+    } catch (error) {
+      console.error("Error uploading file to S3:", error);
+      throw new Error("Failed to upload file to S3");
+    }
+  },
 });
 
 export const listUserLists = query({
@@ -14,7 +58,6 @@ export const listUserLists = query({
 
     const allLists = await ctx.db.query("lists").collect();
 
-    // Filter lists to find those where the user is a participant
     const userLists = allLists.filter((list) =>
       list.participants.some((p) => p.userId == user?.subject)
     );
@@ -411,6 +454,7 @@ export const sendMessage = mutation({
   args: {
     listId: v.id("lists"),
     message: v.string(),
+    attachmentUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const user = await requireUser(ctx);
@@ -424,12 +468,12 @@ export const sendMessage = mutation({
       throw new Error("Unauthorized to send messages to this list");
     }
 
-    // Insert the new message into the messages table
     const newMessage = await ctx.db.insert("messages", {
       listId: args.listId,
       senderId: user?.subject,
       message: args.message,
       timestamp: Date.now(),
+      attachmentUrl: args.attachmentUrl,
     });
     return newMessage;
   },

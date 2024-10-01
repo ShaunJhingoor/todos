@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Fab,
@@ -14,14 +14,17 @@ import {
   Paper,
   Menu,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ChatIcon from "@mui/icons-material/Chat";
-import { useMutation, useQuery } from "convex/react";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
 import { Id } from "../../../convex/_generated/dataModel";
 import { Save as SaveIcon } from "@mui/icons-material";
+
 interface ChatWidgetProps {
   list: {
     _id: Id<"lists">;
@@ -73,11 +76,15 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   const [editMessageId, setEditMessageId] = useState<string | null>(null);
   const [editedMessage, setEditedMessage] = useState<string>("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const messages = useQuery(api.functions.listMessages, { listId: list._id });
   const sendMessage = useMutation(api.functions.sendMessage);
   const updateMessage = useMutation(api.functions.updateMessage);
   const deleteMessage = useMutation(api.functions.deleteMessage);
+  const uploadFile = useAction(api.functions.uploadFileToS3);
 
   const lastMessageIdRef = useRef<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -100,21 +107,60 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
     setOpen(false);
   };
 
-  const handleSendMessage = async () => {
-    if (newMessage.trim()) {
-      try {
-        const response = await sendMessage({
-          listId: list._id,
-          message: newMessage,
-        });
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setFile(event.target.files[0]);
+    }
+  };
 
-        setNewMessage("");
-        setHasNewMessage(false);
-        if (response) {
-          localStorage.setItem(`lastMessageId_${list._id}`, response);
+  const handleSendMessage = async () => {
+    if (newMessage.trim() || file) {
+      try {
+        setIsUploading(true);
+        let attachmentUrl = "";
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = async (e) => {
+            if (e.target && e.target.result) {
+              const base64Data = e.target.result.toString().split(",")[1];
+              attachmentUrl = await uploadFile({
+                file: base64Data,
+                fileName: file.name,
+                contentType: file.type,
+              });
+
+              const response = await sendMessage({
+                listId: list._id,
+                message: newMessage,
+                attachmentUrl,
+              });
+
+              setNewMessage("");
+              setFile(null);
+              setHasNewMessage(false);
+              if (response) {
+                localStorage.setItem(`lastMessageId_${list._id}`, response);
+              }
+            }
+          };
+          reader.readAsDataURL(file);
+        } else {
+          const response = await sendMessage({
+            listId: list._id,
+            message: newMessage,
+          });
+
+          setNewMessage("");
+          setHasNewMessage(false);
+          if (response) {
+            localStorage.setItem(`lastMessageId_${list._id}`, response);
+          }
         }
       } catch (error) {
         console.error("Failed to send message:", error);
+      } finally {
+        setIsUploading(false);
       }
     }
   };
@@ -144,7 +190,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
     const timeoutId = setTimeout(handleMessageCheck, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [messages, list._id]);
+  }, [messages, list._id, open]);
 
   useEffect(() => {
     if (messages && open) {
@@ -179,7 +225,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       handleSendMessage();
     }
@@ -371,6 +417,21 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
                       ) : (
                         <>
                           <Typography variant="body2">{msg.message}</Typography>
+                          {msg.attachmentUrl && (
+                            <Box mt={1}>
+                              <a
+                                href={msg.attachmentUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  color: isCurrentUser ? "white" : "#1976d2",
+                                  textDecoration: "underline",
+                                }}
+                              >
+                                View Attachment
+                              </a>
+                            </Box>
+                          )}
                           <Typography
                             variant="caption"
                             sx={{
@@ -394,18 +455,43 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
             <div ref={messagesEndRef} />
           </Box>
 
-          <TextField
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            variant="outlined"
-            placeholder="Type a message..."
-            fullWidth
-            sx={{ mb: 2 }}
-          />
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            <TextField
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              variant="outlined"
+              placeholder="Type a message..."
+              fullWidth
+              multiline
+              maxRows={4}
+              sx={{ mr: 1 }}
+            />
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              onChange={handleFileChange}
+            />
+            <IconButton
+              onClick={() => fileInputRef.current?.click()}
+              color="primary"
+            >
+              <AttachFileIcon />
+            </IconButton>
+          </Box>
 
-          <Button onClick={handleSendMessage} variant="contained">
-            Send
+          <Button
+            onClick={handleSendMessage}
+            variant="contained"
+            disabled={isUploading}
+            sx={{ position: "relative" }}
+          >
+            {isUploading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Send"
+            )}
           </Button>
         </DialogContent>
       </Dialog>
