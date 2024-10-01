@@ -498,6 +498,28 @@ export const updateMessage = mutation({
   },
 });
 
+export const deleteFileFromS3 = action({
+  args: {
+    fileName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { fileName } = args;
+
+    const command = new DeleteObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: fileName,
+    });
+
+    try {
+      await s3Client.send(command);
+      return { success: true, message: "File deleted successfully" };
+    } catch (error) {
+      console.error("Error deleting file from S3:", error);
+      throw new Error("Failed to delete file from S3");
+    }
+  },
+});
+
 export const deleteMessage = mutation({
   args: {
     messageId: v.id("messages"),

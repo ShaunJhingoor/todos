@@ -72,6 +72,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   const [selectedMessage, setSelectedMessage] = useState<{
     id: string;
     text: string;
+    attachmentUrl?: string;
   } | null>(null);
   const [editMessageId, setEditMessageId] = useState<string | null>(null);
   const [editedMessage, setEditedMessage] = useState<string>("");
@@ -85,6 +86,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   const updateMessage = useMutation(api.functions.updateMessage);
   const deleteMessage = useMutation(api.functions.deleteMessage);
   const uploadFile = useAction(api.functions.uploadFileToS3);
+  const deleteFileFromS3 = useAction(api.functions.deleteFileFromS3);
 
   const lastMessageIdRef = useRef<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -234,11 +236,17 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   const handleOpenMenu = (
     event: React.MouseEvent<HTMLDivElement>,
     messageId: string,
-    messageText: string
+    messageText: string,
+    messageUrl: string
   ) => {
+    console.log("handleOpenMenu:", messageUrl);
     event.preventDefault();
     setAnchorEl(event.currentTarget);
-    setSelectedMessage({ id: messageId, text: messageText });
+    setSelectedMessage({
+      id: messageId,
+      text: messageText,
+      attachmentUrl: messageUrl,
+    });
   };
 
   const handleCloseMenu = () => {
@@ -257,13 +265,35 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
   const handleDeleteMessage = async () => {
     if (selectedMessage) {
       try {
+        const messageId = selectedMessage.id;
+
+        if (typeof messageId !== "string") {
+          console.error("Invalid message ID: ", messageId);
+          return; // Exit the function early
+        }
+
+        // Call deleteMessage with a guaranteed string
         await deleteMessage({
-          messageId: selectedMessage.id as Id<"messages">,
+          messageId: messageId as Id<"messages">,
         });
+
+        console.log("selectedMessage:", selectedMessage);
+        const attachmentUrl = selectedMessage?.attachmentUrl;
+
+        if (attachmentUrl) {
+          const urlParts = attachmentUrl.split("/");
+          const fileName = urlParts[urlParts.length - 1];
+
+          await deleteFileFromS3({
+            fileName,
+          });
+        } else {
+          console.log("No attachment URL to delete from S3.");
+        }
 
         if (
           messages &&
-          messages?.length > 2 &&
+          messages.length > 2 &&
           messages[messages.length - 1]?._id === selectedMessage?.id
         ) {
           localStorage.setItem(
@@ -272,7 +302,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
           );
         }
       } catch (error) {
-        console.error("Failed to delete message:", error);
+        console.error("Failed to delete message or file from S3:", error);
       }
     }
     handleCloseMenu();
@@ -347,7 +377,6 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
                 const isCurrentUser = msg.senderId === user?.id;
                 const senderEmail = getParticipantEmail(msg.senderId);
                 const timestamp = formatTimestamp(msg.timestamp);
-
                 return (
                   <Box
                     key={idx}
@@ -371,7 +400,13 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
                       }}
                       onContextMenu={(e) => {
                         if (isCurrentUser) {
-                          handleOpenMenu(e, msg._id, msg.message);
+                          console.log("msg:", msg);
+                          handleOpenMenu(
+                            e,
+                            msg._id,
+                            msg.message,
+                            msg?.attachmentUrl || ""
+                          );
                         }
                       }}
                     >
