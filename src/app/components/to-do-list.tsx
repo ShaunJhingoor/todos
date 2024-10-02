@@ -13,6 +13,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Button,
 } from "@mui/material";
 import { api } from "../../../convex/_generated/api";
 import { useQuery } from "convex/react";
@@ -21,6 +22,7 @@ import { useMutation } from "convex/react";
 import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import { useUser } from "@clerk/nextjs";
 import { EditTodoModal } from "./Modals/EditToDoModal";
+import GoogleIcon from "@mui/icons-material/Google";
 
 interface TodoListProps {
   listId: Id<"lists">;
@@ -206,6 +208,13 @@ function TodoItem({ todo, listId }: TodoItemProps) {
   const list = useQuery(api.functions.getListById, {
     id: listId as Id<"lists">,
   });
+  const assignedTo = list?.participants.some(
+    (participant) =>
+      participant.userId === user?.id &&
+      participant.role === "editor" &&
+      participant.email === todo.assigneeEmail
+  );
+
   const isEditor = list?.participants.some(
     (participant) =>
       participant.userId === user?.id && participant.role === "editor"
@@ -248,6 +257,27 @@ function TodoItem({ todo, listId }: TodoItemProps) {
   const editorsList = list?.participants.filter(
     (participant) => participant.role === "editor"
   );
+
+  const formatGoogleDateTime = (date: Date) => {
+    if (isNaN(date.getTime())) {
+      console.error("Invalid date value:", date);
+      return "";
+    }
+    return date.toISOString().replace(/[-:]/g, "").split(".")[0];
+  };
+
+  const startDate = todo.dueDate ? new Date(todo.dueDate) : new Date();
+
+  const expectedTimeInHours = parseInt(todo.expectedTime, 10) || 1;
+  const endDate = new Date(
+    startDate.getTime() + expectedTimeInHours * 60 * 60000
+  );
+
+  const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+    todo.title
+  )}&dates=${formatGoogleDateTime(startDate)}/${formatGoogleDateTime(
+    endDate
+  )}&details=${encodeURIComponent(todo.description || "")}`;
 
   return (
     <>
@@ -310,75 +340,105 @@ function TodoItem({ todo, listId }: TodoItemProps) {
               </Typography>
             )}
             {isEditor && editorsList && editorsList.length > 1 && (
-              <FormControl
+              <Box
                 sx={{
-                  marginTop: "1rem",
-                  width: "10rem", // Consistent width
-                  backgroundColor: "#f3f4f6",
-                  borderRadius: "8px",
-                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.15)",
-                  },
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
                 }}
               >
-                <InputLabel
-                  id="assign-select-label"
+                <FormControl
                   sx={{
-                    color: "#374151",
-                    fontSize: "0.9rem",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Assign To-Do
-                </InputLabel>
-                <Select
-                  labelId="assign-select-label"
-                  value={todo.assigneeEmail || "Unassigned"}
-                  onChange={handleAssignChange}
-                  sx={{
+                    marginTop: "1rem",
+                    marginRight: ".5rem",
+                    width: "10rem",
+                    backgroundColor: "#f3f4f6",
                     borderRadius: "8px",
-                    color: "#111827",
-                    "& .MuiSelect-outlined": {
-                      padding: "10px",
-                    },
-                    "& .MuiSelect-select": {
-                      display: "flex",
-                      alignItems: "center",
-                      fontSize: ".8rem",
-                    },
-                    "&:focus": {
-                      outline: "none",
-                    },
-                  }}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: {
-                        borderRadius: "8px",
-                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-                      },
+                    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.15)",
                     },
                   }}
                 >
-                  <MenuItem value="unassigned">
-                    <em>Unassigned</em>
-                  </MenuItem>
-                  {editorsList.map((participant) => (
-                    <MenuItem
-                      key={participant.userId}
-                      value={participant.email}
-                      sx={{
-                        "&:hover": {
-                          backgroundColor: "#e5e7eb",
+                  <InputLabel
+                    id="assign-select-label"
+                    sx={{
+                      color: "#374151",
+                      fontSize: "0.9rem",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Assign To-Do
+                  </InputLabel>
+                  <Select
+                    labelId="assign-select-label"
+                    value={todo.assigneeEmail || "Unassigned"}
+                    onChange={handleAssignChange}
+                    sx={{
+                      borderRadius: "8px",
+                      color: "#111827",
+                      "& .MuiSelect-outlined": {
+                        padding: "10px",
+                      },
+                      "& .MuiSelect-select": {
+                        display: "flex",
+                        alignItems: "center",
+                        fontSize: ".8rem",
+                      },
+                      "&:focus": {
+                        outline: "none",
+                      },
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          borderRadius: "8px",
+                          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
                         },
-                      }}
-                    >
-                      {participant.email}
+                      },
+                    }}
+                  >
+                    <MenuItem value="unassigned">
+                      <em>Unassigned</em>
                     </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                    {editorsList.map((participant) => (
+                      <MenuItem
+                        key={participant.userId}
+                        value={participant.email}
+                        sx={{
+                          "&:hover": {
+                            backgroundColor: "#e5e7eb",
+                          },
+                        }}
+                      >
+                        {participant.email}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                {assignedTo && (
+                  <Tooltip title="Add to Google Calendar">
+                    <IconButton
+                      sx={{
+                        marginTop: "1rem",
+                        color: "#3b82f6",
+                        "&:hover": {
+                          color: "#2563eb",
+                          backgroundColor: "rgba(59, 130, 247, 0.1)",
+                        },
+                        padding: "8px",
+                      }}
+                      href={googleCalendarUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <GoogleIcon sx={{ fontSize: "1.5rem" }} />{" "}
+                      {/* Increase icon size */}
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Box>
             )}
           </Box>
           <div className="flex items-center gap-2">

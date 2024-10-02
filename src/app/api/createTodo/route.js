@@ -6,12 +6,16 @@ export async function POST(req) {
     const openai = new OpenAI();
     const { topic, numberTodos } = await req.json();
 
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowDate = tomorrow.toISOString().split("T")[0];
+
     const systemPrompt = `
     You are a to-do list creator. Given a topic, create exactly ${numberTodos} to-dos.
     Each to-do should include:
     - A concise title.
     - A concise description (no more than one sentence).
-    - A due date in the format 'YYYY-MM-DD', which must be a future date (i.e., a date after today for example today is 2024-09-13 the date has to be after that). Make sure the date format is 'YYYY-MM-DD'.
+    - A due date in the format 'YYYY-MM-DD', which must be a future date (i.e., a date after today, which is ${tomorrowDate}). Make sure the date format is 'YYYY-MM-DD'.
     - An expected time to complete the task in hours (as a number), which should be reasonable for the task and generally between 1 and 5 hours.
     The to-dos should be relevant to the provided topic.
     Return the result in the following JSON format:
