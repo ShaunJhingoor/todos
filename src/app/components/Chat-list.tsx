@@ -109,6 +109,13 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
 
   const handleCloseChat = () => {
     setOpen(false);
+    if (messages && messages.length > 0) {
+      lastMessageIdRef.current = messages[messages.length - 1]._id;
+      localStorage.setItem(
+        `lastMessageId_${list._id}`,
+        messages[messages.length - 1]._id
+      );
+    }
   };
 
   const handlePDFLoad = () => {
@@ -252,7 +259,6 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
     messageText: string,
     messageUrl: string
   ) => {
-    console.log("handleOpenMenu:", messageUrl);
     event.preventDefault();
     setAnchorEl(event.currentTarget);
     setSelectedMessage({
