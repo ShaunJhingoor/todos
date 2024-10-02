@@ -29,5 +29,6 @@ export default defineSchema({
     senderId: v.string(),
     message: v.string(),
     timestamp: v.number(),
+    attachmentUrl: v.optional(v.string()),
   }).index("by_list_id", ["listId"]),
 });

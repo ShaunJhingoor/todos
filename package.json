@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.662.0",
+    "@aws-sdk/s3-request-presigner": "^3.662.0",
     "@clerk/clerk-js": "^5.21.1",
     "@clerk/clerk-sdk-node": "^5.0.35",
     "@clerk/nextjs": "^5.5.2",
@@ -17,6 +19,8 @@
     "@heroicons/react": "^2.1.5",
     "@mui/icons-material": "^6.0.2",
     "@mui/material": "^6.0.2",
+    "aws-sdk": "^2.1691.0",
+    "buffer": "^6.0.3",
     "convex": "^1.15.0",
     "next": "14.2.9",
     "openai": "^4.60.1",
