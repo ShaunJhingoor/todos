@@ -88,7 +88,7 @@ function ListItem({
 
   return (
     <Card
-      className="shadow-lg rounded-xl overflow-hidden"
+      className="shadow-lg rounded-xl overflow-hidden "
       sx={{
         background: "linear-gradient(135deg, #f3f4f6, #e2e8f0)",
         border: "1px solid #e0e0e0",

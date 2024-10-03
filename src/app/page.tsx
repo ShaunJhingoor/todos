@@ -10,7 +10,6 @@ import {
   Typography,
   Button,
   Dialog,
-  DialogTitle,
   DialogContent,
   IconButton,
   Fab,
@@ -31,7 +30,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-200 text-gray-900">
+    <div className="min-h-screen  bg-gradient-to-br from-blue-50 to-blue-300 text-gray-900 text-gray-900">
       {/* Header */}
       <header className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md py-4">
         <Container maxWidth="lg" className="flex items-center justify-between">
@@ -106,8 +105,8 @@ export default function Home() {
       {/* Unauthenticated Content */}
       <Unauthenticated>
         <section className="bg-gradient-to-br from-blue-300 via-blue-400 to-purple-500 text-center py-24 font-poppins">
-          <section className="mb-[10rem] text-center p-8">
-            <div className="flex items-center justify-center mb-[2rem]">
+          <section className="mb-[11rem] mt-[3rem] text-center p-8">
+            <div className="flex items-center justify-center mb-[3rem]">
               <TaskAlt
                 sx={{
                   fontSize: 60,
@@ -128,12 +127,13 @@ export default function Home() {
             </div>
             <Typography
               variant="body1"
-              className="text-gray-200 mb-10 text-center transition-opacity duration-500 hover:opacity-90 text-lg md:text-xl drop-shadow-md"
+              className="text-gray-200 mb-[4rem] text-center transition-opacity duration-500 hover:opacity-90 text-xl md:text-2xl drop-shadow-md"
             >
-              Stay organized and keep track of your tasks. Sign in to access
-              your personalized to-do list and get started!
+              Stay organized and keep track of your tasks.
+              <br />
+              Sign in to access your personalized to-do list and get started!
             </Typography>
-            <div className="flex justify-center space-x-8 mt-8">
+            <div className="flex justify-center space-x-8">
               <SignInButton>
                 <Button
                   variant="contained"
@@ -185,17 +185,17 @@ export default function Home() {
             }
           `}</style>
 
-          <section className="py-[10rem] ">
+          <section className="py-[11rem]">
             <Container maxWidth="lg" className="text-center">
               <Typography
                 variant="h4"
-                className="font-bold mb-10 text-white transition-colors duration-300 text-4xl md:text-5xl drop-shadow-lg"
+                className="font-bold mb-[3rem] text-white transition-colors duration-300 text-4xl md:text-5xl drop-shadow-lg"
               >
                 Why Sign In?
               </Typography>
               <Typography
                 variant="body1"
-                className="text-gray-200 mb-12 transition-opacity duration-500 hover:opacity-90 text-lg md:text-xl drop-shadow-md"
+                className="text-gray-200 mb-[4rem] transition-opacity duration-500 hover:opacity-90 text-xl md:text-2xl drop-shadow-md"
               >
                 By signing in, you gain access to all the features of our to-do
                 list app, including task management, reminders, and real-time
@@ -242,25 +242,24 @@ export default function Home() {
             </Container>
           </section>
 
-          {/* Contact Section */}
-          <section className="py-[10rem]">
+          <section className="py-[11rem]">
             <Container maxWidth="md" className="text-center">
               <Typography
                 variant="h4"
-                className="font-bold mb-8 text-white transition-all text-4xl md:text-5xl drop-shadow-lg"
+                className="font-bold mb-[3rem] text-white transition-all text-4xl md:text-5xl drop-shadow-lg"
               >
                 Get In Touch
               </Typography>
               <Typography
                 variant="body1"
-                className="text-gray-200 mb-6 text-lg md:text-xl drop-shadow-md"
+                className="text-gray-200 mb-[2rem] text-xl md:text-2xl drop-shadow-md"
               >
                 Have questions or need support? Reach out to us, we are here to
                 help you make the most of our app.
               </Typography>
               <a
                 href="mailto:support@example.com"
-                className="inline-block text-white hover:underline text-lg transition-colors hover:text-purple-300 mb-4"
+                className="inline-block text-white hover:underline text-xl md:text-2xl transition-colors hover:text-purple-300 mb-[1.5rem]"
               >
                 support@example.com
               </a>
