@@ -66,7 +66,7 @@ const ToDoHome = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-200 text-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-300 text-gray-900">
       {/* Header */}
       <header className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md py-4">
         <Container maxWidth="lg" className="flex items-center justify-between">
