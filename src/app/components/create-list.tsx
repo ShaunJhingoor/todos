@@ -23,11 +23,9 @@ export function CreateListForm({ onSuccess }: CreateListFormProps) {
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col gap-2">
-        <label htmlFor="name" className="text-sm font-semibold">
-          List Name
-        </label>
+        <h2 className="text-2xl font-semibold mb-4 text-center">Create List</h2>
         <input
-          className="p-2 border rounded bg-white"
+          className="p-2 border rounded bg-white mb-[1rem]"
           type="text"
           name="name"
           id="name"

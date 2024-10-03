@@ -58,6 +58,7 @@ export function AddParticipantModal({
       console.error(error);
     }
   };
+  const isDisabled = !email.trim();
 
   return (
     <Modal
@@ -114,7 +115,6 @@ export function AddParticipantModal({
             fullWidth
             value={role}
             onChange={(e) => setRole(e.target.value as "editor" | "viewer")}
-            className="mb-4"
             size="small"
             style={{
               color: "#6b7280",
@@ -129,15 +129,8 @@ export function AddParticipantModal({
             variant="contained"
             color="primary"
             onClick={handleAddParticipant}
-            className="w-full mt-4"
-            style={{
-              backgroundColor: "#4f46e5",
-              color: "#ffffff",
-              padding: "0.75rem",
-              borderRadius: "0.5rem",
-              textTransform: "none",
-              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.15)",
-            }}
+            className={`p-2 rounded text-white w-full mt-[1rem] cursor-pointer ${isDisabled ? "bg-gray-400" : "bg-blue-500"} transition-colors`}
+            disabled={isDisabled}
           >
             Add Participant
           </Button>
