@@ -160,11 +160,11 @@ export default function Home() {
           <Container maxWidth="lg" className="text-center">
             <Typography
               variant="h4"
-              className="font-semibold mb-8 text-blue-800"
+              className="font-semibold mb-[1.5rem] text-blue-800"
             >
               Why Sign In?
             </Typography>
-            <Typography variant="body1" className="text-gray-700 mb-[5vh]">
+            <Typography variant="body1" className="text-gray-700 mb-[3rem]">
               By signing in, you gain access to all the features of our to-do
               list app, including task management, reminders, and real-time
               collaboration. Your tasks are securely saved and synchronized
