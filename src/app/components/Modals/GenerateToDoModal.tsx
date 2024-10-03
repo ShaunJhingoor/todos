@@ -23,13 +23,11 @@ export function GenerateToDoModal({
   const [topic, setTopic] = useState("");
   const [numberTodos, setNumberTodos] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const createTodo = useMutation(api.functions.createTodo);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
       const response = await fetch("/api/createTodo", {
