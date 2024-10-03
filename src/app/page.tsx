@@ -120,14 +120,14 @@ export default function Home() {
               />
               <Typography
                 variant="h3"
-                className="font-bold text-white text-4xl md:text-5xl drop-shadow-lg ml-4"
+                className="font-bold text-white text-4xl md:text-5xl drop-shadow-lg ml-4 mb-[2rem]"
               >
                 Welcome to Your To-Do List App
               </Typography>
             </div>
             <Typography
               variant="body1"
-              className="text-gray-200 mb-[4rem] text-center transition-opacity duration-500 hover:opacity-90 text-xl md:text-2xl drop-shadow-md"
+              className="text-gray-200 mb-[4rem] text-center transition-opacity duration-500 hover:opacity-90 text-[1.6rem] drop-shadow-md"
             >
               Stay organized and keep track of your tasks.
               <br />
