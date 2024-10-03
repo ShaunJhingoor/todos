@@ -140,12 +140,14 @@ export default function Home() {
                   variant="contained"
                   sx={{
                     bgcolor: "#2196F3",
+                    fontSize: "1.2rem",
+                    borderRadius: "9999px",
                     "&:hover": {
                       bgcolor: "#1976D2",
                     },
                     transition: "all 0.3s ease-in-out",
                   }}
-                  className="shadow-lg transform hover:scale-105 hover:-translate-y-1 transition-transform duration-300 text-white py-2 px-6 text-lg rounded-full ring-2 ring-blue-500 ring-opacity-40"
+                  className="shadow-lg transform hover:scale-105 hover:-translate-y-1 transition-transform duration-300 text-white py-2 px-6 ring-2 ring-blue-500 ring-opacity-40"
                 >
                   Sign In
                 </Button>
@@ -155,12 +157,14 @@ export default function Home() {
                   variant="contained"
                   sx={{
                     bgcolor: "#9C27B0",
+                    fontSize: "1.2rem",
+                    borderRadius: "9999px",
                     "&:hover": {
                       bgcolor: "#7B1FA2",
                     },
                     transition: "all 0.3s ease-in-out",
                   }}
-                  className="shadow-lg transform hover:scale-105 hover:-translate-y-1 transition-transform duration-300 text-white py-2 px-6 text-lg rounded-full ring-2 ring-purple-500 ring-opacity-40"
+                  className="shadow-lg transform hover:scale-105 hover:-translate-y-1 transition-transform duration-300 text-white py-2 px-6 ring-2 ring-purple-500 ring-opacity-40"
                 >
                   Sign Up
                 </Button>
