@@ -45,7 +45,6 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
       >
         Create New Todo
       </Typography>
-      {/* <h2 className="text-2xl font-semibold mb-4 text-center">Edit Todo</h2> */}
       <Box className="flex flex-col gap-2">
         <TextField
           label="Title"
@@ -57,6 +56,7 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
           required
           sx={{
             backgroundColor: "#f9fafb",
+            marginBottom: "1rem",
             "& .MuiInputBase-input": {
               color: "#1f2937",
             },
@@ -77,6 +77,7 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
           required
           sx={{
             backgroundColor: "#f9fafb",
+            marginBottom: "1rem",
             "& .MuiInputBase-input": {
               color: "#1f2937",
             },
@@ -97,6 +98,7 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
           }}
           sx={{
             backgroundColor: "#f9fafb",
+            marginBottom: "1rem",
             "& .MuiInputBase-input": {
               color: "#1f2937",
             },
@@ -109,11 +111,13 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
           label="Expected Time (in hours)"
           variant="outlined"
           fullWidth
+          type="number"
           value={expectedTime}
           onChange={(e) => setExpectedTime(e.target.value)}
           placeholder="Enter expected time to complete"
           sx={{
             backgroundColor: "#f9fafb",
+            marginBottom: "1rem",
             "& .MuiInputBase-input": {
               color: "#1f2937",
             },
@@ -128,7 +132,6 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
           color="primary"
           fullWidth
           sx={{
-            marginTop: "16px",
             backgroundColor: isDisabled ? "#cfd8dc" : "#4f46e5",
             "&:hover": {
               backgroundColor: isDisabled ? "#cfd8dc" : "#4338ca",

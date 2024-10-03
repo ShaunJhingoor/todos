@@ -155,8 +155,8 @@ const ToDoHome = () => {
                 fullWidth
                 PaperProps={{
                   sx: {
-                    borderRadius: "20px", // Increased border radius for better visibility
-                    overflow: "hidden", // Ensure the content respects the border radius
+                    borderRadius: "20px",
+                    overflow: "hidden",
                   },
                 }}
               >
@@ -194,39 +194,27 @@ const ToDoHome = () => {
                 onClose={handleCloseGenerate}
                 maxWidth="sm"
                 fullWidth
+                PaperProps={{
+                  sx: {
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                  },
+                }}
               >
-                <DialogTitle
+                <IconButton
+                  edge="end"
+                  color="inherit"
+                  onClick={handleCloseGenerate}
+                  aria-label="close"
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative",
-                    fontSize: "1.2rem",
-                    fontWeight: "medium",
-                    color: "primary.main",
-                    padding: "16px 24px",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    background: "linear-gradient(135deg, #f3f4f6, #e2e8f0)",
-                    borderBottom: "1px solid #e0e0e0",
+                    position: "absolute",
+                    right: 12,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
                   }}
                 >
-                  Generate To-Dos
-                  <IconButton
-                    edge="end"
-                    color="inherit"
-                    onClick={handleCloseGenerate}
-                    aria-label="close"
-                    sx={{
-                      position: "absolute",
-                      right: 8,
-                      top: 8,
-                      color: (theme) => theme.palette.grey[500],
-                    }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                </DialogTitle>
+                  <CloseIcon />
+                </IconButton>
                 <DialogContent
                   sx={{
                     padding: "24px",
