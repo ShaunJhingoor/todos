@@ -50,39 +50,32 @@ export default function Home() {
       <Authenticated>
         <Container maxWidth="lg">
           <main className="space-y-8">
-            <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-              <DialogTitle
+            <Dialog
+              open={open}
+              onClose={handleClose}
+              maxWidth="sm"
+              fullWidth
+              PaperProps={{
+                sx: {
+                  borderRadius: "20px",
+                  overflow: "hidden",
+                },
+              }}
+            >
+              <IconButton
+                edge="end"
+                color="inherit"
+                onClick={handleClose}
+                aria-label="close"
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  position: "relative",
-                  fontSize: "1.2rem",
-                  fontWeight: "medium",
-                  color: "primary.main",
-                  padding: "16px 24px",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  background: "linear-gradient(135deg, #f3f4f6, #e2e8f0)",
-                  borderBottom: "1px solid #e0e0e0",
+                  position: "absolute",
+                  right: 12,
+                  top: 8,
+                  color: (theme) => theme.palette.grey[500],
                 }}
               >
-                Add New List
-                <IconButton
-                  edge="end"
-                  color="inherit"
-                  onClick={handleClose}
-                  aria-label="close"
-                  sx={{
-                    position: "absolute",
-                    right: 8,
-                    top: 8,
-                    color: (theme) => theme.palette.grey[500],
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </DialogTitle>
+                <CloseIcon />
+              </IconButton>
               <DialogContent
                 sx={{
                   padding: "24px",
@@ -112,17 +105,35 @@ export default function Home() {
 
       {/* Unauthenticated Content */}
       <Unauthenticated>
-        {/* Hero Section */}
-        <section className="bg-gradient-to-br from-blue-200 to-blue-400 text-center py-20">
-          <Box className="bg-white p-12 rounded-lg shadow-xl max-w-2xl mx-auto transform transition-transform hover:scale-105">
-            <Typography variant="h3" className="font-bold mb-4 text-blue-900">
-              Welcome to Your To-Do List App
-            </Typography>
-            <Typography variant="body1" className="text-gray-700 mb-6">
+        <section className="bg-gradient-to-br from-blue-300 via-blue-400 to-purple-500 text-center py-24 font-poppins">
+          <section className="mb-[10rem] text-center p-8">
+            <div className="flex items-center justify-center mb-[2rem]">
+              <TaskAlt
+                sx={{
+                  fontSize: 60,
+                  color: "#ffffff",
+                  animation: "bounce 1s infinite",
+                  transition: "color 0.3s ease-in-out",
+                  "&:hover": {
+                    color: "#FF4081",
+                  },
+                }}
+              />
+              <Typography
+                variant="h3"
+                className="font-bold text-white text-4xl md:text-5xl drop-shadow-lg ml-4"
+              >
+                Welcome to Your To-Do List App
+              </Typography>
+            </div>
+            <Typography
+              variant="body1"
+              className="text-gray-200 mb-10 text-center transition-opacity duration-500 hover:opacity-90 text-lg md:text-xl drop-shadow-md"
+            >
               Stay organized and keep track of your tasks. Sign in to access
               your personalized to-do list and get started!
             </Typography>
-            <div className="space-x-4 mt-[1vh]">
+            <div className="flex justify-center space-x-8 mt-8">
               <SignInButton>
                 <Button
                   variant="contained"
@@ -131,8 +142,9 @@ export default function Home() {
                     "&:hover": {
                       bgcolor: "#1976D2",
                     },
+                    transition: "all 0.3s ease-in-out",
                   }}
-                  className="shadow-lg"
+                  className="shadow-lg transform hover:scale-105 hover:-translate-y-1 transition-transform duration-300 text-white py-2 px-6 text-lg rounded-full ring-2 ring-blue-500 ring-opacity-40"
                 >
                   Sign In
                 </Button>
@@ -145,94 +157,122 @@ export default function Home() {
                     "&:hover": {
                       bgcolor: "#7B1FA2",
                     },
+                    transition: "all 0.3s ease-in-out",
                   }}
-                  className="shadow-lg"
+                  className="shadow-lg transform hover:scale-105 hover:-translate-y-1 transition-transform duration-300 text-white py-2 px-6 text-lg rounded-full ring-2 ring-purple-500 ring-opacity-40"
                 >
                   Sign Up
                 </Button>
               </SignUpButton>
             </div>
-          </Box>
-        </section>
+          </section>
 
-        {/* Features Section */}
-        <section className="bg-gray-100 py-20">
-          <Container maxWidth="lg" className="text-center">
-            <Typography
-              variant="h4"
-              className="font-semibold mb-[1.5rem] text-blue-800"
-            >
-              Why Sign In?
-            </Typography>
-            <Typography variant="body1" className="text-gray-700 mb-[3rem]">
-              By signing in, you gain access to all the features of our to-do
-              list app, including task management, reminders, and real-time
-              collaboration. Your tasks are securely saved and synchronized
-              across all your devices.
-            </Typography>
-            <Box className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Box className="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-transform">
-                <TaskAlt sx={{ fontSize: 60, color: "#3f51b5" }} />
-                <Typography
-                  variant="h6"
-                  className="font-semibold mb-3 text-blue-800"
-                >
-                  Task Management
-                </Typography>
-                <Typography variant="body2" className="text-gray-600">
-                  Easily create, edit, and delete tasks with our intuitive
-                  interface.
-                </Typography>
-              </Box>
-              <Box className="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-transform">
-                <SmartToy sx={{ fontSize: 60, color: "#f57c00" }} />
-                <Typography
-                  variant="h6"
-                  className="font-semibold mb-3 text-blue-800"
-                >
-                  AI To-Dos
-                </Typography>
-                <Typography variant="body2" className="text-gray-600">
-                  Generate to-dos for a tasks based on any topic using AI. Let
-                  AI help you stay organized and focused on your goals.
-                </Typography>
-              </Box>
-              <Box className="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-transform">
-                <People sx={{ fontSize: 60, color: "#1976d2" }} />
-                <Typography
-                  variant="h6"
-                  className="font-semibold mb-3 text-blue-800"
-                >
-                  Collaboration
-                </Typography>
-                <Typography variant="body2" className="text-gray-600">
-                  Share tasks and collaborate with others in real-time.
-                </Typography>
-              </Box>
-            </Box>
-          </Container>
-        </section>
+          <style jsx>{`
+            @keyframes bounce {
+              0%,
+              20%,
+              50%,
+              80%,
+              100% {
+                transform: translateY(0);
+              }
+              40% {
+                transform: translateY(-10px);
+              }
+              60% {
+                transform: translateY(-5px);
+              }
+            }
+          `}</style>
 
-        {/* Contact Section */}
-        <section className="bg-blue-50 py-20">
-          <Container maxWidth="md" className="text-center">
-            <Typography
-              variant="h4"
-              className="font-semibold mb-8 text-blue-800"
-            >
-              Get In Touch
-            </Typography>
-            <Typography variant="body1" className="text-gray-700 mb-4">
-              Have questions or need support? Reach out to us—we’re here to help
-              you make the most of our app.
-            </Typography>
-            <a
-              href="mailto:jhingoor1945@gmail.com"
-              className="text-blue-700 hover:underline text-lg"
-            >
-              support@example.com
-            </a>
-          </Container>
+          <section className="py-[10rem] ">
+            <Container maxWidth="lg" className="text-center">
+              <Typography
+                variant="h4"
+                className="font-bold mb-10 text-white transition-colors duration-300 text-4xl md:text-5xl drop-shadow-lg"
+              >
+                Why Sign In?
+              </Typography>
+              <Typography
+                variant="body1"
+                className="text-gray-200 mb-12 transition-opacity duration-500 hover:opacity-90 text-lg md:text-xl drop-shadow-md"
+              >
+                By signing in, you gain access to all the features of our to-do
+                list app, including task management, reminders, and real-time
+                collaboration.
+              </Typography>
+              <Box className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                {[
+                  {
+                    icon: <TaskAlt sx={{ fontSize: 60, color: "#3f51b5" }} />,
+                    title: "Task Management",
+                    description:
+                      "Easily create, edit, and delete tasks with our intuitive interface.",
+                  },
+                  {
+                    icon: <SmartToy sx={{ fontSize: 60, color: "#f57c00" }} />,
+                    title: "AI To-Dos",
+                    description:
+                      "Generate to-dos for tasks based on any topic using AI. Stay organized and focused on your goals.",
+                  },
+                  {
+                    icon: <People sx={{ fontSize: 60, color: "#1976d2" }} />,
+                    title: "Collaboration",
+                    description:
+                      "Share tasks and collaborate with others in real-time.",
+                  },
+                ].map((feature, index) => (
+                  <Box
+                    key={index}
+                    className="p-8 rounded-lg shadow-lg bg-white transition-transform transform hover:scale-105 hover:shadow-2xl duration-500 border border-gray-300 hover:border-purple-500"
+                  >
+                    {feature.icon}
+                    <Typography
+                      variant="h6"
+                      className="font-semibold mb-3 text-blue-800 text-xl drop-shadow-md"
+                    >
+                      {feature.title}
+                    </Typography>
+                    <Typography variant="body2" className="text-gray-700">
+                      {feature.description}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Container>
+          </section>
+
+          {/* Contact Section */}
+          <section className="py-[10rem]">
+            <Container maxWidth="md" className="text-center">
+              <Typography
+                variant="h4"
+                className="font-bold mb-8 text-white transition-all text-4xl md:text-5xl drop-shadow-lg"
+              >
+                Get In Touch
+              </Typography>
+              <Typography
+                variant="body1"
+                className="text-gray-200 mb-6 text-lg md:text-xl drop-shadow-md"
+              >
+                Have questions or need support? Reach out to us, we are here to
+                help you make the most of our app.
+              </Typography>
+              <a
+                href="mailto:support@example.com"
+                className="inline-block text-white hover:underline text-lg transition-colors hover:text-purple-300 mb-4"
+              >
+                support@example.com
+              </a>
+              <br />
+              <a
+                href="mailto:support@example.com"
+                className="inline-block bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-300"
+              >
+                Contact Support
+              </a>
+            </Container>
+          </section>
         </section>
       </Unauthenticated>
 

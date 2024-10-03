@@ -23,11 +23,9 @@ export function CreateListForm({ onSuccess }: CreateListFormProps) {
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col gap-2">
-        <label htmlFor="name" className="text-sm font-semibold">
-          List Name
-        </label>
+        <h2 className="text-2xl font-semibold mb-4 text-center">Create List</h2>
         <input
-          className="p-2 border rounded bg-white"
+          className="p-2 border rounded bg-white mb-[1rem]"
           type="text"
           name="name"
           id="name"
@@ -38,7 +36,8 @@ export function CreateListForm({ onSuccess }: CreateListFormProps) {
         />
         <button
           type="submit"
-          className={`p-2 rounded text-white cursor-pointer ${isDisabled ? "bg-gray-400" : "bg-blue-500"} transition-colors`}
+          className={`p-2 rounded text-white cursor-pointer ${isDisabled ? "bg-gray-400" : ""} transition-colors`}
+          style={{ backgroundColor: isDisabled ? undefined : "#4e46e5" }}
           disabled={isDisabled}
         >
           Create

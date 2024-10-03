@@ -104,7 +104,7 @@ export function EditListModal({ isOpen, onClose, list }: EditListModalProps) {
       BackdropComponent={Backdrop}
       BackdropProps={{
         style: { backgroundColor: "rgba(0, 0, 0, 0.7)" },
-        timeout: 500,
+        timeout: 1000,
       }}
     >
       <Fade in={isOpen}>

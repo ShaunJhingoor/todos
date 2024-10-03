@@ -98,11 +98,7 @@ export function GenerateToDoModal({
       <Typography
         variant="h6"
         component="h2"
-        sx={{
-          textAlign: "center",
-          fontWeight: "medium",
-          marginBottom: "16px",
-        }}
+        className="text-2xl font-semibold mb-4 text-center"
       >
         Generate To-Dos
       </Typography>
@@ -115,15 +111,36 @@ export function GenerateToDoModal({
           onChange={(e) => setTopic(e.target.value)}
           placeholder="Enter a topic for the to-dos"
           required
+          sx={{
+            backgroundColor: "#f9fafb",
+            marginBottom: "1rem",
+            "& .MuiInputBase-input": {
+              color: "#1f2937",
+            },
+            "& .MuiFormLabel-root": {
+              color: "#6b7280",
+            },
+          }}
         />
         <TextField
           label="Number of To-Dos"
           variant="outlined"
           fullWidth
           value={numberTodos}
+          type="number"
           onChange={(e) => setNumberTodos(e.target.value)}
           placeholder="Enter the number of to-dos to generate"
           required
+          sx={{
+            backgroundColor: "#f9fafb",
+            marginBottom: "1rem",
+            "& .MuiInputBase-input": {
+              color: "#1f2937",
+            },
+            "& .MuiFormLabel-root": {
+              color: "#6b7280",
+            },
+          }}
         />
         <Button
           type="submit"
@@ -131,10 +148,9 @@ export function GenerateToDoModal({
           color="primary"
           fullWidth
           sx={{
-            marginTop: "16px",
-            backgroundColor: isDisabled ? "#cfd8dc" : "#1976d2",
+            backgroundColor: isDisabled ? "#cfd8dc" : "#4f46e5",
             "&:hover": {
-              backgroundColor: isDisabled ? "#cfd8dc" : "#1565c0",
+              backgroundColor: isDisabled ? "#cfd8dc" : "#4338ca",
             },
           }}
           disabled={isDisabled || loading}
@@ -145,11 +161,6 @@ export function GenerateToDoModal({
             "Generate To-Dos"
           )}
         </Button>
-        {error && (
-          <Typography color="error" sx={{ marginTop: "16px" }}>
-            {error}
-          </Typography>
-        )}
       </Box>
     </Box>
   );
