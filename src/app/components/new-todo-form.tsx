@@ -41,14 +41,11 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
       <Typography
         variant="h6"
         component="h2"
-        sx={{
-          textAlign: "center",
-          fontWeight: "medium",
-          marginBottom: "16px",
-        }}
+        className="text-2xl font-semibold mb-4 text-center"
       >
         Create New Todo
       </Typography>
+      {/* <h2 className="text-2xl font-semibold mb-4 text-center">Edit Todo</h2> */}
       <Box className="flex flex-col gap-2">
         <TextField
           label="Title"
@@ -58,6 +55,15 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter To-Do title"
           required
+          sx={{
+            backgroundColor: "#f9fafb",
+            "& .MuiInputBase-input": {
+              color: "#1f2937",
+            },
+            "& .MuiFormLabel-root": {
+              color: "#6b7280",
+            },
+          }}
         />
         <TextField
           label="Description"
@@ -69,6 +75,15 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter To-Do description"
           required
+          sx={{
+            backgroundColor: "#f9fafb",
+            "& .MuiInputBase-input": {
+              color: "#1f2937",
+            },
+            "& .MuiFormLabel-root": {
+              color: "#6b7280",
+            },
+          }}
         />
         <TextField
           label="Due Date"
@@ -77,16 +92,16 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
           fullWidth
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
-          // required
           InputLabelProps={{
             shrink: true,
           }}
           sx={{
+            backgroundColor: "#f9fafb",
             "& .MuiInputBase-input": {
-              padding: "16.5px 14px",
+              color: "#1f2937",
             },
             "& .MuiFormLabel-root": {
-              top: "12px",
+              color: "#6b7280",
             },
           }}
         />
@@ -97,7 +112,15 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
           value={expectedTime}
           onChange={(e) => setExpectedTime(e.target.value)}
           placeholder="Enter expected time to complete"
-          // required
+          sx={{
+            backgroundColor: "#f9fafb",
+            "& .MuiInputBase-input": {
+              color: "#1f2937",
+            },
+            "& .MuiFormLabel-root": {
+              color: "#6b7280",
+            },
+          }}
         />
         <Button
           type="submit"
@@ -106,9 +129,9 @@ export function CreateTodoForm({ listId, onSuccess }: CreateTodoFormProps) {
           fullWidth
           sx={{
             marginTop: "16px",
-            backgroundColor: isDisabled ? "#cfd8dc" : "#1976d2",
+            backgroundColor: isDisabled ? "#cfd8dc" : "#4f46e5",
             "&:hover": {
-              backgroundColor: isDisabled ? "#cfd8dc" : "#1565c0",
+              backgroundColor: isDisabled ? "#cfd8dc" : "#4338ca",
             },
           }}
           disabled={isDisabled}
