@@ -7,7 +7,6 @@ import {
   IconButton,
   Fab,
   Dialog,
-  DialogTitle,
   DialogContent,
 } from "@mui/material";
 import { UserButton, useUser } from "@clerk/nextjs";
