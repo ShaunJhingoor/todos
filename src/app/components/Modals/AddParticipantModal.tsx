@@ -68,7 +68,7 @@ export function AddParticipantModal({
       BackdropComponent={Backdrop}
       BackdropProps={{
         style: { backgroundColor: "rgba(0, 0, 0, 0.7)" },
-        timeout: 500,
+        timeout: 1000,
       }}
     >
       <Fade in={isOpen}>
@@ -81,7 +81,7 @@ export function AddParticipantModal({
           }}
         >
           <IconButton
-            className="absolute top-2 right-2"
+            className="absolute top-2"
             onClick={onClose}
             aria-label="Close"
             style={{ color: "#1f2937" }}
@@ -120,6 +120,7 @@ export function AddParticipantModal({
               color: "#6b7280",
               backgroundColor: "#f9fafb",
               minWidth: "100px",
+              marginBottom: "1rem",
             }}
           >
             <MenuItem value="viewer">Viewer</MenuItem>

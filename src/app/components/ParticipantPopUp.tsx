@@ -145,7 +145,7 @@ export const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({
                   }
                   margin="dense"
                   fullWidth
-                  sx={{ bgcolor: "background.default", borderRadius: 1 }} // Match modal styling
+                  sx={{ bgcolor: "background.default", borderRadius: 1 }}
                 >
                   <MenuItem value="editor">Editor</MenuItem>
                   <MenuItem value="viewer">Viewer</MenuItem>

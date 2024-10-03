@@ -65,7 +65,7 @@ export function EditTodoModal({ isOpen, onClose, todo }: EditTodoModalProps) {
       BackdropComponent={Backdrop}
       BackdropProps={{
         style: { backgroundColor: "rgba(0, 0, 0, 0.7)" },
-        timeout: 500,
+        timeout: 1000,
       }}
     >
       <Fade in={isOpen}>
