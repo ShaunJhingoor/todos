@@ -194,13 +194,15 @@ export default function Home() {
             <Container maxWidth="lg" className="text-center">
               <Typography
                 variant="h4"
-                className="font-bold mb-[3rem] text-white transition-colors duration-300 text-4xl md:text-5xl drop-shadow-lg"
+                className="font-bold text-white transition-colors duration-300 drop-shadow-lg"
+                style={{ fontSize: "3rem", marginBottom: "3rem" }}
               >
                 Why Sign In?
               </Typography>
               <Typography
                 variant="body1"
-                className="text-gray-200 mb-[4rem] transition-opacity duration-500 hover:opacity-90 text-xl md:text-2xl drop-shadow-md"
+                className="text-gray-200 transition-opacity duration-500 hover:opacity-90 drop-shadow-md"
+                style={{ fontSize: "1.6rem", marginBottom: "4rem" }}
               >
                 By signing in, you gain access to all the features of our to-do
                 list app, including task management, reminders, and real-time
@@ -251,13 +253,15 @@ export default function Home() {
             <Container maxWidth="md" className="text-center">
               <Typography
                 variant="h4"
-                className="font-bold mb-[3rem] text-white transition-all text-4xl md:text-5xl drop-shadow-lg"
+                className="font-bold text-white transition-all drop-shadow-lg"
+                style={{ fontSize: "3rem", marginBottom: "2rem" }}
               >
                 Get In Touch
               </Typography>
               <Typography
                 variant="body1"
-                className="text-gray-200 mb-[2rem] text-xl md:text-2xl drop-shadow-md"
+                className="text-gray-200 drop-shadow-md"
+                style={{ fontSize: "1.6rem", marginBottom: "2rem" }}
               >
                 Have questions or need support? Reach out to us, we are here to
                 help you make the most of our app.
