@@ -14,7 +14,7 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import { Card, CardContent, Typography, Box } from "@mui/material";
 import { ExitToApp as LeaveIcon } from "@mui/icons-material";
-import ParticipantsPopover from "./ParticipantPopUp";
+import { ParticipantsPopover } from "./ParticipantPopUp";
 import { Visibility as VisibilityIcon } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 

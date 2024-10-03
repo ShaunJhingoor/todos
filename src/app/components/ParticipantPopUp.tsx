@@ -40,7 +40,7 @@ interface ParticipantsPopoverProps {
   };
 }
 
-const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({
+export const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({
   open,
   anchorEl,
   onClose,
@@ -103,9 +103,21 @@ const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({
         vertical: "top",
         horizontal: "left",
       }}
-      sx={{ padding: 2 }}
+      PaperProps={{
+        sx: {
+          borderRadius: "20px",
+          overflow: "hidden",
+          boxShadow: 2,
+          padding: 2,
+          background: "linear-gradient(135deg, #f3f4f6, #e2e8f0)",
+        },
+      }}
     >
-      <Typography variant="h6" gutterBottom>
+      <Typography
+        variant="h6"
+        gutterBottom
+        className="p-[.5rem] text-xl font-semibold"
+      >
         Participants
       </Typography>
       <Divider sx={{ mb: 1 }} />
@@ -133,6 +145,7 @@ const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({
                   }
                   margin="dense"
                   fullWidth
+                  sx={{ bgcolor: "background.default", borderRadius: 1 }} // Match modal styling
                 >
                   <MenuItem value="editor">Editor</MenuItem>
                   <MenuItem value="viewer">Viewer</MenuItem>
@@ -146,16 +159,28 @@ const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({
                 >
                   <Button
                     startIcon={<SaveIcon />}
-                    color="primary"
+                    sx={{
+                      color: "white",
+                      bgcolor: "primary.main",
+                      "&:hover": {
+                        bgcolor: "primary.dark",
+                      },
+                    }}
                     onClick={handleSaveClick}
                   >
                     Save
                   </Button>
                   <Button
                     startIcon={<CancelIcon />}
-                    color="secondary"
+                    sx={{
+                      color: "white",
+                      bgcolor: "error.main",
+                      "&:hover": {
+                        bgcolor: "error.dark",
+                      },
+                      marginLeft: "8px",
+                    }}
                     onClick={handleCancelClick}
-                    style={{ marginLeft: "8px" }}
                   >
                     Cancel
                   </Button>
@@ -198,5 +223,3 @@ const ParticipantsPopover: React.FC<ParticipantsPopoverProps> = ({
     </Popover>
   );
 };
-
-export default ParticipantsPopover;
