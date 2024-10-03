@@ -112,66 +112,73 @@ export default function Home() {
 
       {/* Unauthenticated Content */}
       <Unauthenticated>
-        {/* Hero Section */}
-        <section className="bg-gradient-to-br from-blue-200 to-blue-400 text-center py-20">
-          <Box className="bg-white p-12 rounded-lg shadow-xl max-w-2xl mx-auto transform transition-transform hover:scale-105">
-            <Typography variant="h3" className="font-bold mb-4 text-blue-900">
-              Welcome to Your To-Do List App
-            </Typography>
-            <Typography variant="body1" className="text-gray-700 mb-6">
-              Stay organized and keep track of your tasks. Sign in to access
-              your personalized to-do list and get started!
-            </Typography>
-            <div className="space-x-4 mt-[1vh]">
-              <SignInButton>
-                <Button
-                  variant="contained"
-                  sx={{
-                    bgcolor: "#2196F3",
-                    "&:hover": {
-                      bgcolor: "#1976D2",
-                    },
-                  }}
-                  className="shadow-lg"
-                >
-                  Sign In
-                </Button>
-              </SignInButton>
-              <SignUpButton>
-                <Button
-                  variant="contained"
-                  sx={{
-                    bgcolor: "#9C27B0",
-                    "&:hover": {
-                      bgcolor: "#7B1FA2",
-                    },
-                  }}
-                  className="shadow-lg"
-                >
-                  Sign Up
-                </Button>
-              </SignUpButton>
-            </div>
-          </Box>
+        <section className="bg-gradient-to-br from-blue-300 via-blue-400 to-purple-500 text-center py-20">
+          <Typography
+            variant="h3"
+            className="font-bold mb-6 text-white transition-transform transform hover:scale-110 hover:rotate-1 duration-500"
+          >
+            Welcome to Your To-Do List App
+          </Typography>
+          <Typography
+            variant="body1"
+            className="text-gray-100 mb-10 transition-opacity duration-500 hover:opacity-90"
+          >
+            Stay organized and keep track of your tasks. Sign in to access your
+            personalized to-do list and get started!
+          </Typography>
+          <div className="flex justify-center space-x-6 mt-6">
+            <SignInButton>
+              <Button
+                variant="contained"
+                sx={{
+                  bgcolor: "#2196F3",
+                  "&:hover": {
+                    bgcolor: "#1976D2",
+                  },
+                  transition: "all 0.3s ease-in-out",
+                }}
+                className="shadow-lg transform hover:scale-110 hover:-translate-y-1 transition-transform duration-300"
+              >
+                Sign In
+              </Button>
+            </SignInButton>
+            <SignUpButton>
+              <Button
+                variant="contained"
+                sx={{
+                  bgcolor: "#9C27B0",
+                  "&:hover": {
+                    bgcolor: "#7B1FA2",
+                  },
+                  transition: "all 0.3s ease-in-out",
+                }}
+                className="shadow-lg transform hover:scale-110 hover:-translate-y-1 transition-transform duration-300"
+              >
+                Sign Up
+              </Button>
+            </SignUpButton>
+          </div>
         </section>
 
         {/* Features Section */}
-        <section className="bg-gray-100 py-20">
+        <section className="bg-gradient-to-r from-gray-50 via-gray-100 to-gray-200 py-20">
           <Container maxWidth="lg" className="text-center">
             <Typography
               variant="h4"
-              className="font-semibold mb-[1.5rem] text-blue-800"
+              className="font-semibold mb-6 text-blue-800 transition-colors duration-300 hover:text-purple-500"
             >
               Why Sign In?
             </Typography>
-            <Typography variant="body1" className="text-gray-700 mb-[3rem]">
+            <Typography
+              variant="body1"
+              className="text-gray-700 mb-12 transition-opacity duration-500 hover:opacity-90"
+            >
               By signing in, you gain access to all the features of our to-do
               list app, including task management, reminders, and real-time
-              collaboration. Your tasks are securely saved and synchronized
-              across all your devices.
+              collaboration.
             </Typography>
             <Box className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Box className="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-transform">
+              <Box className="p-8 rounded-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-transform bg-white">
                 <TaskAlt sx={{ fontSize: 60, color: "#3f51b5" }} />
                 <Typography
                   variant="h6"
@@ -184,7 +191,7 @@ export default function Home() {
                   interface.
                 </Typography>
               </Box>
-              <Box className="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-transform">
+              <Box className="p-8 rounded-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-transform bg-white">
                 <SmartToy sx={{ fontSize: 60, color: "#f57c00" }} />
                 <Typography
                   variant="h6"
@@ -193,11 +200,11 @@ export default function Home() {
                   AI To-Dos
                 </Typography>
                 <Typography variant="body2" className="text-gray-600">
-                  Generate to-dos for a tasks based on any topic using AI. Let
-                  AI help you stay organized and focused on your goals.
+                  Generate to-dos for tasks based on any topic using AI. Stay
+                  organized and focused on your goals.
                 </Typography>
               </Box>
-              <Box className="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-transform">
+              <Box className="p-8 rounded-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-transform bg-white">
                 <People sx={{ fontSize: 60, color: "#1976d2" }} />
                 <Typography
                   variant="h6"
@@ -214,11 +221,11 @@ export default function Home() {
         </section>
 
         {/* Contact Section */}
-        <section className="bg-blue-50 py-20">
+        <section className="bg-gradient-to-r from-blue-50 via-blue-100 to-blue-200 py-20">
           <Container maxWidth="md" className="text-center">
             <Typography
               variant="h4"
-              className="font-semibold mb-8 text-blue-800"
+              className="font-semibold mb-8 text-blue-800 hover:text-purple-500 transition-all"
             >
               Get In Touch
             </Typography>
@@ -227,8 +234,8 @@ export default function Home() {
               you make the most of our app.
             </Typography>
             <a
-              href="mailto:jhingoor1945@gmail.com"
-              className="text-blue-700 hover:underline text-lg"
+              href="mailto:support@example.com"
+              className="text-blue-700 hover:underline text-lg transition-colors hover:text-purple-500"
             >
               support@example.com
             </a>
