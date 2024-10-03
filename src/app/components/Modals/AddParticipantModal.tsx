@@ -129,7 +129,8 @@ export function AddParticipantModal({
             variant="contained"
             color="primary"
             onClick={handleAddParticipant}
-            className={`p-2 rounded text-white w-full mt-[1rem] cursor-pointer ${isDisabled ? "bg-gray-400" : "bg-blue-500"} transition-colors`}
+            className={`p-2 rounded text-white w-full mt-[1rem] cursor-pointer ${isDisabled ? "bg-gray-400" : ""} transition-colors`}
+            style={{ backgroundColor: isDisabled ? undefined : "#4e46e5" }}
             disabled={isDisabled}
           >
             Add Participant

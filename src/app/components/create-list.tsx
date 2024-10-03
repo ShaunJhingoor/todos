@@ -36,7 +36,8 @@ export function CreateListForm({ onSuccess }: CreateListFormProps) {
         />
         <button
           type="submit"
-          className={`p-2 rounded text-white cursor-pointer ${isDisabled ? "bg-gray-400" : "bg-blue-500"} transition-colors`}
+          className={`p-2 rounded text-white cursor-pointer ${isDisabled ? "bg-gray-400" : ""} transition-colors`}
+          style={{ backgroundColor: isDisabled ? undefined : "#4e46e5" }}
           disabled={isDisabled}
         >
           Create
