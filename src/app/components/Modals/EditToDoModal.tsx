@@ -142,6 +142,15 @@ export function EditTodoModal({ isOpen, onClose, todo }: EditTodoModalProps) {
             }}
             InputLabelProps={{
               style: { color: "#6b7280" },
+              shrink: true,
+            }}
+            sx={{
+              "& .MuiInputBase-input": {
+                padding: "16.5px 14px",
+              },
+              "& .MuiFormLabel-root": {
+                top: "12px",
+              },
             }}
           />
           <TextField
