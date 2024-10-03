@@ -128,6 +128,7 @@ export default function Home() {
             <Typography
               variant="body1"
               className="text-gray-200 mb-[4rem] text-center transition-opacity duration-500 hover:opacity-90 text-[1.6rem] drop-shadow-md"
+              style={{ fontSize: "1.6rem", marginBottom: "4rem" }}
             >
               Stay organized and keep track of your tasks.
               <br />
