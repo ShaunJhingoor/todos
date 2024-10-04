@@ -4,4 +4,6 @@ To Dos is a task management platform built with **Convex** for the backend, **Ne
 
 Check out <a href="https://todos-zeta-smoky.vercel.app/" target="_blank" rel="noopener noreferrer">To Dos</a> today!
 
-<a href="https://www.youtube.com/watch?v=-hFDDZ_16f0" target="_blank" rel="noopener noreferrer">Watch the Video Demo</a>
+<a href="https://www.youtube.com/watch?v=-hFDDZ_16f0" target="_blank" rel="noopener noreferrer">Watch the Video Demo Phase 1</a>
+
+<a href="https://youtu.be/nR5j_-DVFVk" target="_blank" rel="noopener noreferrer">Watch the Video Demo Phase 2</a>
