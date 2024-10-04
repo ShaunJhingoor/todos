@@ -267,14 +267,14 @@ export default function Home() {
                 help you make the most of our app.
               </Typography>
               <a
-                href="mailto:support@example.com"
+                href="mailto:Jhingoor1945@gmail.com"
                 className="inline-block text-white hover:underline text-xl md:text-2xl transition-colors hover:text-purple-300 mb-[1.5rem]"
               >
                 support@example.com
               </a>
               <br />
               <a
-                href="mailto:support@example.com"
+                href="mailto:Jhingoor1945@gmail.com"
                 className="inline-block bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-300"
               >
                 Contact Support
