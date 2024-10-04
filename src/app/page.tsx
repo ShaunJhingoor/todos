@@ -114,7 +114,7 @@ export default function Home() {
                   animation: "bounce 1s infinite",
                   transition: "color 0.3s ease-in-out",
                   "&:hover": {
-                    color: "#FF4081",
+                    color: "green",
                   },
                 }}
               />
