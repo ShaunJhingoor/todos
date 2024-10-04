@@ -296,7 +296,7 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
           messageId: messageId as Id<"messages">,
         });
 
-        console.log("selectedMessage:", selectedMessage);
+        
         const attachmentUrl = selectedMessage?.attachmentUrl;
 
         if (attachmentUrl) {
@@ -428,7 +428,6 @@ export const ChatWidget = ({ list }: ChatWidgetProps) => {
                       }}
                       onContextMenu={(e) => {
                         if (isCurrentUser) {
-                          console.log("msg:", msg);
                           handleOpenMenu(
                             e,
                             msg._id,
