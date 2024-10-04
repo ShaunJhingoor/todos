@@ -132,7 +132,9 @@ export function EditListModal({ isOpen, onClose, list }: EditListModalProps) {
             onChange={(e) => setNewName(e.target.value)}
             variant="outlined"
             size="small"
-            className="mb-4"
+            style={{
+              marginBottom: "1.5rem",
+            }}
             InputProps={{
               style: { color: "#1f2937", backgroundColor: "#f9fafb" },
             }}
@@ -142,16 +144,23 @@ export function EditListModal({ isOpen, onClose, list }: EditListModalProps) {
           />
 
           {participants.length > 1 && (
-            <div className="mb-4">
+            <div
+              style={{
+                marginBottom: "1.5rem",
+              }}
+            >
               <h3 className="text-lg font-medium mb-2">Participants</h3>
               {participants.slice(1).map((participant) => (
                 <div
                   key={participant.userId}
-                  className={`flex items-center justify-between mb-2 p-2 rounded-md border ${
+                  className={`flex items-center justify-between p-2 rounded-md border ${
                     pendingChanges.removedUsers.includes(participant.userId)
                       ? "bg-gray-200 border-gray-300 text-gray-500"
                       : "bg-white border-gray-200 text-gray-700"
                   }`}
+                  style={{
+                    marginBottom: ".75rem",
+                  }}
                 >
                   <span
                     className={`text-sm ${
@@ -215,7 +224,7 @@ export function EditListModal({ isOpen, onClose, list }: EditListModalProps) {
             variant="contained"
             color="primary"
             onClick={handleSaveChanges}
-            className="w-full mt-4"
+            className="w-full"
             style={{
               backgroundColor: "#4f46e5",
               color: "#ffffff",
